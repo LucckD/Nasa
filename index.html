@@ -1,96 +1,93 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Visualização de Queimadas na Amazônia</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="webgl-container"></div>
-    <div id="map-container"></div>
 
-    <div id="scroll-prompt">
-      <div class="mouse">
-        <div class="wheel"></div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Visualização de Queimadas na Amazônia</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="shortcut icon" href="img/space_orange@.png" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div id="webgl-container"></div>
+  <div id="map-container"></div>
+
+  <div id="scroll-prompt">
+    <div class="mouse">
+      <div class="wheel"></div>
+    </div>
+    <span>Role para explorar</span>
+  </div>
+
+  <div id="hotzone-panel">
+    <h4>ZONA DE ALERTA</h4>
+    <p>A região com maior atividade nas últimas 24h é:</p>
+    <strong id="hotzone-region">Calculando...</strong>
+  </div>
+
+  <main class="story-panel">
+    <section id="introducao" class="story-section">
+      <div class="content">
+        <h2>O Planeta Sob Ameaça</h2>
+        <p>
+          Esta é uma jornada interativa que utiliza dados de satélite para
+          visualizar um dos problemas ambientais mais urgentes do nosso tempo.
+          Role para começar.
+        </p>
       </div>
-      <span>Role para explorar</span>
-    </div>
+    </section>
 
-    <div id="hotzone-panel">
-      <h4>ZONA DE ALERTA</h4>
-      <p>A região com maior atividade nas últimas 24h é:</p>
-      <strong id="hotzone-region">Calculando...</strong>
-    </div>
+    <section id="america-sul" class="story-section">
+      <div class="content">
+        <h2>Foco na América do Sul</h2>
+        <p>
+          Nossa análise se concentra na América do Sul, uma região de
+          biodiversidade incomparável, mas que enfrenta desafios ambientais
+          significativos, especialmente na Bacia Amazônica.
+        </p>
+      </div>
+    </section>
 
-    <main class="story-panel">
-      <section id="introducao" class="story-section">
-        <div class="content">
-          <h2>O Planeta Sob Ameaça</h2>
-          <p>
-            Esta é uma jornada interativa que utiliza dados de satélite para
-            visualizar um dos problemas ambientais mais urgentes do nosso tempo.
-            Role para começar.
-          </p>
-        </div>
-      </section>
+    <section id="brasil" class="story-section">
+      <div class="content">
+        <h2>Um Olhar Sobre o Brasil</h2>
+        <p>
+          O Brasil abriga a maior parte da Floresta Amazônica. À medida que
+          nos aproximamos, a escala da floresta se torna evidente, assim como
+          sua vulnerabilidade.
+        </p>
+      </div>
+    </section>
 
-      <section id="america-sul" class="story-section">
-        <div class="content">
-          <h2>Foco na América do Sul</h2>
-          <p>
-            Nossa análise se concentra na América do Sul, uma região de
-            biodiversidade incomparável, mas que enfrenta desafios ambientais
-            significativos, especialmente na Bacia Amazônica.
-          </p>
-        </div>
-      </section>
+    <section id="analise-dados" class="story-section">
+      <div class="content">
+        <h2>Análise dos Dados</h2>
+        <h3><span id="fire-counter">0</span> focos detectados</h3>
+        <p>
+          Explore os focos de incêndio detectados pelos satélites da NASA.
+          Arraste o slider para viajar no tempo e visualizar os dados de cada
+          um dos últimos 7 dias.
+        </p>
 
-      <section id="brasil" class="story-section">
-        <div class="content">
-          <h2>Um Olhar Sobre o Brasil</h2>
-          <p>
-            O Brasil abriga a maior parte da Floresta Amazônica. À medida que
-            nos aproximamos, a escala da floresta se torna evidente, assim como
-            sua vulnerabilidade.
-          </p>
-        </div>
-      </section>
-
-      <section id="analise-dados" class="story-section">
-        <div class="content">
-          <h2>Análise dos Dados</h2>
-          <h3><span id="fire-counter">0</span> focos detectados</h3>
-          <p>
-            Explore os focos de incêndio detectados pelos satélites da NASA.
-            Arraste o slider para viajar no tempo e visualizar os dados de cada
-            um dos últimos 7 dias.
-          </p>
-
-          <div id="timeslider-container">
-            <input type="range" min="0" max="6" value="6" id="time-slider" />
-            <div class="labels">
-              <span id="start-date-label">7 dias atrás</span>
-              <strong id="current-date-label">Hoje</strong>
-            </div>
-          </div>
-
-          <div id="view-toggle-container">
-            <button id="toggle-view-btn">Analisar Densidade</button>
-            <button id="about-data-btn">Saiba Mais Sobre os Dados</button>
+        <div id="timeslider-container">
+          <input type="range" min="0" max="6" value="6" id="time-slider" />
+          <div class="labels">
+            <span id="start-date-label">7 dias atrás</span>
+            <strong id="current-date-label">Hoje</strong>
           </div>
         </div>
-      </section>
+
+        <div id="view-toggle-container">
+          <button id="toggle-view-btn">Analisar Densidade</button>
+          <button id="about-data-btn">Saiba Mais Sobre os Dados</button>
+        </div>
+      </div>
+    </section>
 
       <section id="conclusao" class="story-section">
         <div class="content">
@@ -128,64 +125,67 @@
           </image-compare-viewer>
         </div>
       </section>
-
-      <section id="mapaDeFogo">
-        <div class="content">
-          <iframe
-            src="https://arcg.is/1CvGmz3"
-            width="100%"
-            frameborder="0"
-            allowfullscreen
-            allow="geolocation"
-          ></iframe>
-        </div>
-      </section>
-    </main>
-
-    <div id="data-modal" class="modal-overlay">
-      <div class="modal-content">
-        <button id="close-modal-btn" class="close-btn">&times;</button>
-        <h3>Sobre a Fonte dos Dados</h3>
+    <section id="conclusao" class="story-section">
+      <div class="content">
+        <h2>Consciência e Ação</h2>
         <p>
-          Os dados de focos de calor são fornecidos quase em tempo real pelo
-          sistema
-          <strong
-            >FIRMS (Fire Information for Resource Management System)</strong
-          >
-          da NASA.
+          Visualizar os dados é o primeiro passo. A conscientização gerada por
+          essas tecnologias é fundamental para impulsionar ações de
+          conservação e políticas de proteção ambiental mais eficazes.
         </p>
-
-        <h4>Satélite e Sensor</h4>
-        <p>
-          Utilizamos os dados do sensor <strong>VIIRS</strong> a bordo do
-          satélite Suomi NPP, que possui uma resolução espacial de
-          aproximadamente 375 metros.
-        </p>
-
-        <h4>Precisão e "Fogo na Água"</h4>
-        <p>É importante notar duas características destes dados:</p>
-        <ul>
-          <li>
-            <strong>Margem de Erro:</strong> Devido à resolução, um incêndio
-            costeiro pode ter suas coordenadas reportadas ligeiramente mar
-            adentro.
-          </li>
-          <li>
-            <strong>Falsos Positivos:</strong> O sensor detecta calor intenso,
-            não fogo. Por isso, a queima de gás em
-            <strong>plataformas de petróleo</strong> em alto-mar é
-            frequentemente classificada como um foco de incêndio, explicando a
-            maioria dos pontos sobre o oceano.
-          </li>
-        </ul>
       </div>
-    </div>
+    </section>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+    <section id="mapaDeFogo">
+      <div class="content">
+        <iframe src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f" width="100%" height="500px"
+          frameborder="0" allowfullscreen allow="geolocation"></iframe>
+      </div>
+    </section>
+  </main>
+
+  <div id="data-modal" class="modal-overlay">
+    <div class="modal-content">
+      <button id="close-modal-btn" class="close-btn">&times;</button>
+      <h3>Sobre a Fonte dos Dados</h3>
+      <p>
+        Os dados de focos de calor são fornecidos quase em tempo real pelo
+        sistema
+        <strong>FIRMS (Fire Information for Resource Management System)</strong>
+        da NASA.
+      </p>
+
+      <h4>Satélite e Sensor</h4>
+      <p>
+        Utilizamos os dados do sensor <strong>VIIRS</strong> a bordo do
+        satélite Suomi NPP, que possui uma resolução espacial de
+        aproximadamente 375 metros.
+      </p>
+
+      <h4>Precisão e "Fogo na Água"</h4>
+      <p>É importante notar duas características destes dados:</p>
+      <ul>
+        <li>
+          <strong>Margem de Erro:</strong> Devido à resolução, um incêndio
+          costeiro pode ter suas coordenadas reportadas ligeiramente mar
+          adentro.
+        </li>
+        <li>
+          <strong>Falsos Positivos:</strong> O sensor detecta calor intenso,
+          não fogo. Por isso, a queima de gás em
+          <strong>plataformas de petróleo</strong> em alto-mar é
+          frequentemente classificada como um foco de incêndio, explicando a
+          maioria dos pontos sobre o oceano.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
     <script src="app.js"></script>
 
@@ -194,4 +194,7 @@
 </footer>
 
   </body>
+  <script src="app.js"></script>
+</body>
+
 </html>
