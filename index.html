@@ -1,152 +1,184 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Storytelling 3D - Terra e Queimadas</title>
     <style>
-        /* CSS BÁSICO E ESTRUTURAL */
-        body { 
-            margin: 0; 
-            background-color: black;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #333;
-        }
-        
-        /* 1. O CANVAS 3D FICA FIXO ATRÁS DE TUDO */
-        .webgl-container {
-            position: fixed;
-            top: 0;
-            left: 0; /* Altere para 0 para ocupar a tela toda */
-            width: 100vw;
-            height: 100vh;
-            z-index: 1; 
-        }
+      /* CSS BÁSICO E ESTRUTURAL */
+      body {
+        margin: 0;
+        background-color: black;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: #333;
+      }
 
-        /* 2. O CONTEÚDO DE TEXTO ROLÁVEL */
-        .story-content {
-            position: relative;
-            z-index: 10; 
-            max-width: 400px; 
-            /* Painel lateral */
-            margin-left: 10%; 
-            /* Posiciona o painel à esquerda */
-            padding: 20px;
-            /* Fundo semi-transparente para ver a Terra */
-            background: rgba(255, 255, 255, 0.85); 
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-        }
+      /* Garante que cada seção da história ocupe pelo menos a altura da tela inteira */
+      #america-sul,
+      #brasil,
+      #queimadas,
+      #antes-depois {
+        min-height: 100vh; /* vh = viewport height = % da altura da tela */
+      }
 
-        /* 3. CADA SEÇÃO DEVE SER ALTA O SUFICIENTE PARA ROLAR */
-        section {
-            height: 100vh; 
-            /* Cada seção ocupa a tela inteira, garantindo tempo de rolagem */
-            padding: 50px 0;
-        }
+      /* 1. O CANVAS 3D FICA FIXO ATRÁS DE TUDO */
+      .webgl-container {
+        position: fixed;
+        top: 0;
+        left: 0; /* Altere para 0 para ocupar a tela toda */
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+      }
 
-        h2 {
-            margin-top: 40vh; /* Empurra o H2 para baixo para centralizar a rolagem */
-            color: #1e3a8a;
-            border-bottom: 3px solid #f97316;
-            padding-bottom: 10px;
-        }
+      /* 2. O CONTEÚDO DE TEXTO ROLÁVEL */
+      .story-content {
+        position: relative;
+        z-index: 10;
+        max-width: 400px;
+        /* Painel lateral */
+        margin-left: 10%;
+        /* Posiciona o painel à esquerda */
+        padding: 20px;
+        /* Fundo semi-transparente para ver a Terra */
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+      }
 
-        /* Esconder o overflow na introdução para focar no 3D, se necessário */
-        #intro h2 {
-            margin-top: 50vh;
-        }
-        
-        /* NOVO: Estilo para o Painel de Contexto Fixo (Direita) */
-        .fixed-context-panel {
-            position: fixed;
-            top: 50%; /* Alinha verticalmente ao centro */
-            right: 5%; /* Fica na direita */
-            transform: translateY(-50%); /* Ajuste de centralização vertical */
-            width: 350px; /* Largura do painel */
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-            z-index: 15; /* Acima de tudo */
-            
-            /* INICIALMENTE INVISÍVEL - O GSAP irá controlar o opacity e pointer-events */
-            opacity: 0; 
-            pointer-events: none; 
-        }
+      /* 3. CADA SEÇÃO DEVE SER ALTA O SUFICIENTE PARA ROLAR */
+      section {
+        height: 100vh;
+        /* Cada seção ocupa a tela inteira, garantindo tempo de rolagem */
+        padding: 50px 0;
+      }
 
-        .fixed-context-panel h3 {
-            text-align: center;
-            color: #f97316;
-            margin-top: 0;
-        }
+      h2 {
+        margin-top: 40vh; /* Empurra o H2 para baixo para centralizar a rolagem */
+        color: #1e3a8a;
+        border-bottom: 3px solid #f97316;
+        padding-bottom: 10px;
+      }
 
-        .fixed-context-panel .image-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+      /* Esconder o overflow na introdução para focar no 3D, se necessário */
+      #intro h2 {
+        margin-top: 50vh;
+      }
 
-        .fixed-context-panel img {
-            width: 100%;
-            height: auto;
-            border-radius: 4px;
-        }
+      /* NOVO: Estilo para o Painel de Contexto Fixo (Direita) */
+      .fixed-context-panel {
+        position: fixed;
+        top: 50%; /* Alinha verticalmente ao centro */
+        right: 5%; /* Fica na direita */
+        transform: translateY(-50%); /* Ajuste de centralização vertical */
+        width: 350px; /* Largura do painel */
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        z-index: 15; /* Acima de tudo */
 
-        .fixed-context-panel .caption {
-            margin-top: 10px;
-            font-size: 0.9em;
-            text-align: center;
-        }
+        /* INICIALMENTE INVISÍVEL - O GSAP irá controlar o opacity e pointer-events */
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .fixed-context-panel h3 {
+        text-align: center;
+        color: #f97316;
+        margin-top: 0;
+      }
+
+      .fixed-context-panel .image-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .fixed-context-panel img {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+      }
+
+      .fixed-context-panel .caption {
+        margin-top: 10px;
+        font-size: 0.9em;
+        text-align: center;
+      }
     </style>
-</head>
-<body>
-
-    <div class="webgl-container" id="webgl-container">
-    </div>
+  </head>
+  <body>
+    <div class="webgl-container" id="webgl-container"></div>
 
     <div class="fixed-context-panel" id="fixed-context-panel">
-        <h3>Região: Mato Grosso - Antes e Depois</h3>
-        <div class="image-container">
-            <img src="https://via.placeholder.com/300x200?text=ANTES+(1990)" alt="Imagem Antes" class="img-before">
-            <img src="https://via.placeholder.com/300x200?text=DEPOIS+(2020)" alt="Imagem Depois" class="img-after">
-        </div>
-        <p class="caption">Imagens de satélite demonstram a perda de vegetação.</p>
+      <h3>Região: Mato Grosso - Antes e Depois</h3>
+      <div class="image-container">
+        <img
+          src="https://via.placeholder.com/300x200?text=ANTES+(1990)"
+          alt="Imagem Antes"
+          class="img-before"
+        />
+        <img
+          src="https://via.placeholder.com/300x200?text=DEPOIS+(2020)"
+          alt="Imagem Depois"
+          class="img-after"
+        />
+      </div>
+      <p class="caption">
+        Imagens de satélite demonstram a perda de vegetação.
+      </p>
     </div>
     <div class="story-content">
+      <section id="intro">
+        <h2>🌍 INTRODUÇÃO</h2>
+        <p>
+          Este é o planeta Terra, uma esfera de dados 3D. Role para iniciar a
+          jornada de storytelling focada nas queimadas no Brasil.
+        </p>
+        <img
+          src="https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg"
+          alt="Terra"
+          style="width: 100%; border-radius: 10px; margin-top: 20px"
+        />
+      </section>
 
-        <section id="intro">
-            <h2>🌍 INTRODUÇÃO</h2>
-            <p>Este é o planeta Terra, uma esfera de dados 3D. Role para iniciar a jornada de storytelling focada nas queimadas no Brasil.</p>
-            <img src="https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg" alt="Terra" style="width:100%; border-radius: 10px; margin-top: 20px;">
-        </section>
+      <section id="america-sul">
+        <h2>📍 AMÉRICA DO SUL</h2>
+        <p>
+          Conforme você rola, a Terra rotaciona suavemente para focar na América
+          do Sul, preparando o palco para o nosso estudo.
+        </p>
+      </section>
 
-        <section id="america-sul">
-            <h2>📍 AMÉRICA DO SUL</h2>
-            <p>Conforme você rola, a Terra rotaciona suavemente para focar na América do Sul, preparando o palco para o nosso estudo.</p>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/9/99/South_America_%28orthographic_projection%29.svg" alt="América do Sul" style="width:100%; border-radius: 10px; margin-top: 20px;">
+      <section id="brasil">
+        <h2>🇧🇷 FOCO NO BRASIL</h2>
+        <p>
+          A câmera se aproxima (zoom-in) do território brasileiro. Nosso ponto
+          focal se torna mais nítido. **Observe o painel lateral!**
+        </p>
+      </section>
 
-        </section>
+      <section id="queimadas">
+        <h2>🔥 DADOS DE QUEIMADAS</h2>
+        <p>
+          Neste ponto, os dados históricos de focos de incêndio surgem na
+          superfície do país, representando a extensão do problema ao longo dos
+          anos.
+        </p>
+      </section>
 
-        <section id="brasil">
-            <h2>🇧🇷 FOCO NO BRASIL</h2>
-            <p>A câmera se aproxima (zoom-in) do território brasileiro. Nosso ponto focal se torna mais nítido. **Observe o painel lateral!**</p>
-        </section>
-
-        <section id="queimadas">
-            <h2>🔥 DADOS DE QUEIMADAS</h2>
-            <p>Neste ponto, os dados históricos de focos de incêndio surgem na superfície do país, representando a extensão do problema ao longo dos anos.</p>
-        </section>
-
-        <section id="antes-depois">
-            <h2>⏳ ANTES & DEPOIS</h2>
-            <p>Uma transição visual (ou uma rotação sutil) para comparar diferentes períodos e o impacto da mudança de uso do solo.</p>
-        </section>
-
+      <section id="antes-depois">
+        <h2>⏳ ANTES & DEPOIS</h2>
+        <p>
+          Uma transição visual (ou uma rotação sutil) para comparar diferentes
+          períodos e o impacto da mudança de uso do solo.
+        </p>
+      </section>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="app.js"></script>
-</body>
+  </body>
 </html>
