@@ -103,6 +103,32 @@
         </div>
       </section>
 
+      <section id="antes-depois" class="story-section">
+        <div class="content">
+          <h2>A Cicatriz na Floresta (Dados SAR)</h2>
+          <p>
+            Estas imagens de <strong>Radar de Abertura Sintética (SAR)</strong>,
+            do satélite Sentinel-1, mostram uma área em Rondônia, Brasil. A
+            tecnologia SAR nos permite ver através de nuvens e fumaça. Arraste o
+            slider para comparar a mesma região entre 2020 e 2021 e veja a
+            "cicatriz" roxa do desmatamento se expandir.
+          </p>
+
+          <image-compare-viewer>
+            <img
+              slot="image-1"
+              src="textures/sar_antes.jpg"
+              alt="Rondônia em 2020 (SAR)"
+            />
+            <img
+              slot="image-2"
+              src="textures/sar_depois.jpg"
+              alt="Rondônia em 2021 (SAR)"
+            />
+          </image-compare-viewer>
+        </div>
+      </section>
+
       <section id="mapaDeFogo">
         <div class="content">
           <iframe
@@ -162,5 +188,10 @@
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
     <script src="app.js"></script>
+
+<footer>
+    <p> &copy; Desenvolvido por EchoSpace - 2025</p>
+</footer>
+
   </body>
 </html>
