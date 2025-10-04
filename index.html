@@ -59,25 +59,27 @@
         </div>
       </section>
 
-      <section id="queimadas" class="story-section">
+      <section id="analise-dados" class="story-section">
         <div class="content">
-          <h2>Os Dados Revelam a Realidade</h2>
+          <h2>Análise dos Dados</h2>
           <h3><span id="fire-counter">0</span> focos detectados</h3>
           <p>
-            Cada ponto que surge no mapa representa um alerta de incêndio
-            individual detectado por satélites nas últimas 24 horas.
+            Explore os focos de incêndio detectados pelos satélites da NASA.
+            Arraste o slider para viajar no tempo e visualizar os dados de cada
+            um dos últimos 7 dias.
           </p>
-        </div>
-      </section>
 
-      <section id="densidade" class="story-section">
-        <div class="content">
-          <h2>Analisando a Densidade</h2>
-          <p>
-            Ao agrupar os milhares de alertas individuais, um mapa de calor
-            revela as áreas de maior concentração de incêndios, mostrando as
-            "zonas quentes" que exigem atenção imediata.
-          </p>
+          <div id="timeslider-container">
+            <input type="range" min="0" max="6" value="6" id="time-slider" />
+            <div class="labels">
+              <span id="start-date-label">7 dias atrás</span>
+              <strong id="current-date-label">Hoje</strong>
+            </div>
+          </div>
+
+          <div id="view-toggle-container">
+            <button id="toggle-view-btn">Analisar Densidade</button>
+          </div>
         </div>
       </section>
 
