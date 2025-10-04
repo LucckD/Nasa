@@ -19,6 +19,14 @@
   <body>
     <div id="webgl-container"></div>
     <div id="map-container"></div>
+
+    <div id="scroll-prompt">
+      <div class="mouse">
+        <div class="wheel"></div>
+      </div>
+      <span>Role para explorar</span>
+    </div>
+
     <div id="hotzone-panel">
       <h4>ZONA DE ALERTA</h4>
       <p>A região com maior atividade nas últimas 24h é:</p>
@@ -79,6 +87,7 @@
 
           <div id="view-toggle-container">
             <button id="toggle-view-btn">Analisar Densidade</button>
+            <button id="about-data-btn">Saiba Mais Sobre os Dados</button>
           </div>
         </div>
       </section>
@@ -106,6 +115,45 @@
         </div>
       </section>
     </main>
+
+    <div id="data-modal" class="modal-overlay">
+      <div class="modal-content">
+        <button id="close-modal-btn" class="close-btn">&times;</button>
+        <h3>Sobre a Fonte dos Dados</h3>
+        <p>
+          Os dados de focos de calor são fornecidos quase em tempo real pelo
+          sistema
+          <strong
+            >FIRMS (Fire Information for Resource Management System)</strong
+          >
+          da NASA.
+        </p>
+
+        <h4>Satélite e Sensor</h4>
+        <p>
+          Utilizamos os dados do sensor <strong>VIIRS</strong> a bordo do
+          satélite Suomi NPP, que possui uma resolução espacial de
+          aproximadamente 375 metros.
+        </p>
+
+        <h4>Precisão e "Fogo na Água"</h4>
+        <p>É importante notar duas características destes dados:</p>
+        <ul>
+          <li>
+            <strong>Margem de Erro:</strong> Devido à resolução, um incêndio
+            costeiro pode ter suas coordenadas reportadas ligeiramente mar
+            adentro.
+          </li>
+          <li>
+            <strong>Falsos Positivos:</strong> O sensor detecta calor intenso,
+            não fogo. Por isso, a queima de gás em
+            <strong>plataformas de petróleo</strong> em alto-mar é
+            frequentemente classificada como um foco de incêndio, explicando a
+            maioria dos pontos sobre o oceano.
+          </li>
+        </ul>
+      </div>
+    </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
