@@ -110,3 +110,43 @@ body {
 .fire-popup b {
     color: #a0a0a0;
 }
+
+#hotzone-panel {
+    position: fixed;
+    top: 20px;
+    right: -300px; /* Começa fora da tela */
+    width: 250px;
+    padding: 20px;
+    background: rgba(255, 69, 0, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 8px 0 0 8px;
+    color: white;
+    z-index: 10;
+    opacity: 0;
+    transition: right 0.8s ease-out, opacity 0.8s ease-out;
+}
+#hotzone-panel h4 { margin-bottom: 5px; }
+#hotzone-panel p { font-size: 0.9rem; margin-bottom: 15px; }
+#hotzone-region { font-size: 1.5rem; font-weight: 600; }
+
+#mapaDeFogo {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box; 
+    overflow: hidden;
+}
+
+#mapaDeFogo .content {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#mapaDeFogo .content iframe {
+    height: 100%; 
+    width: 100%; 
+    display: block; 
+}

@@ -1,63 +1,108 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Visualização de Queimadas na Amazônia</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div id="webgl-container"></div>
     <div id="map-container"></div>
+    <div id="hotzone-panel">
+      <h4>ZONA DE ALERTA</h4>
+      <p>A região com maior atividade nas últimas 24h é:</p>
+      <strong id="hotzone-region">Calculando...</strong>
+    </div>
 
     <main class="story-panel">
-        <section id="introducao" class="story-section">
-            <div class="content">
-                <h2>O Planeta Sob Ameaça</h2>
-                <p>Esta é uma jornada interativa que utiliza dados de satélite para visualizar um dos problemas ambientais mais urgentes do nosso tempo. Role para começar.</p>
-            </div>
-        </section>
+      <section id="introducao" class="story-section">
+        <div class="content">
+          <h2>O Planeta Sob Ameaça</h2>
+          <p>
+            Esta é uma jornada interativa que utiliza dados de satélite para
+            visualizar um dos problemas ambientais mais urgentes do nosso tempo.
+            Role para começar.
+          </p>
+        </div>
+      </section>
 
-        <section id="america-sul" class="story-section">
-            <div class="content">
-                <h2>Foco na América do Sul</h2>
-                <p>Nossa análise se concentra na América do Sul, uma região de biodiversidade incomparável, mas que enfrenta desafios ambientais significativos, especialmente na Bacia Amazônica.</p>
-            </div>
-        </section>
+      <section id="america-sul" class="story-section">
+        <div class="content">
+          <h2>Foco na América do Sul</h2>
+          <p>
+            Nossa análise se concentra na América do Sul, uma região de
+            biodiversidade incomparável, mas que enfrenta desafios ambientais
+            significativos, especialmente na Bacia Amazônica.
+          </p>
+        </div>
+      </section>
 
-        <section id="brasil" class="story-section">
-            <div class="content">
-                <h2>Um Olhar Sobre o Brasil</h2>
-                <p>O Brasil abriga a maior parte da Floresta Amazônica. À medida que nos aproximamos, a escala da floresta se torna evidente, assim como sua vulnerabilidade.</p>
-            </div>
-        </section>
+      <section id="brasil" class="story-section">
+        <div class="content">
+          <h2>Um Olhar Sobre o Brasil</h2>
+          <p>
+            O Brasil abriga a maior parte da Floresta Amazônica. À medida que
+            nos aproximamos, a escala da floresta se torna evidente, assim como
+            sua vulnerabilidade.
+          </p>
+        </div>
+      </section>
 
-        <section id="queimadas" class="story-section">
-            <div class="content">
-                <h2>Os Dados Revelam a Realidade</h2>
-                <h3><span id="fire-counter">0</span> focos detectados</h3>
-                <p>Cada ponto que surge no mapa representa um alerta de incêndio individual detectado por satélites nas últimas 24 horas.</p>
-            </div>
-        </section>
-        
-        <section id="densidade" class="story-section">
-            <div class="content">
-                <h2>Analisando a Densidade</h2>
-                <p>Ao agrupar os milhares de alertas individuais, um mapa de calor revela as áreas de maior concentração de incêndios, mostrando as "zonas quentes" que exigem atenção imediata.</p>
-            </div>
-        </section>
+      <section id="queimadas" class="story-section">
+        <div class="content">
+          <h2>Os Dados Revelam a Realidade</h2>
+          <h3><span id="fire-counter">0</span> focos detectados</h3>
+          <p>
+            Cada ponto que surge no mapa representa um alerta de incêndio
+            individual detectado por satélites nas últimas 24 horas.
+          </p>
+        </div>
+      </section>
 
-        <section id="conclusao" class="story-section">
-            <div class="content">
-                <h2>Consciência e Ação</h2>
-                <p>Visualizar os dados é o primeiro passo. A conscientização gerada por essas tecnologias é fundamental para impulsionar ações de conservação e políticas de proteção ambiental mais eficazes.</p>
-            </div>
-        </section>
+      <section id="densidade" class="story-section">
+        <div class="content">
+          <h2>Analisando a Densidade</h2>
+          <p>
+            Ao agrupar os milhares de alertas individuais, um mapa de calor
+            revela as áreas de maior concentração de incêndios, mostrando as
+            "zonas quentes" que exigem atenção imediata.
+          </p>
+        </div>
+      </section>
+
+      <section id="conclusao" class="story-section">
+        <div class="content">
+          <h2>Consciência e Ação</h2>
+          <p>
+            Visualizar os dados é o primeiro passo. A conscientização gerada por
+            essas tecnologias é fundamental para impulsionar ações de
+            conservação e políticas de proteção ambiental mais eficazes.
+          </p>
+        </div>
+      </section>
+
+      <section id="mapaDeFogo">
+        <div class="content">
+          <iframe
+            src="https://arcg.is/1CvGmz3"
+            width="100%"
+            frameborder="0"
+            allowfullscreen
+            allow="geolocation"
+          ></iframe>
+        </div>
+      </section>
     </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -67,6 +112,5 @@
     <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
 
     <script src="app.js"></script>
-
-</body>
+  </body>
 </html>
