@@ -1,237 +1,213 @@
-// Variável para armazenar os dados de queimadas e evitar múltiplas chamadas
+// --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
+let scene, camera, renderer, earth, clouds;
 let cachedFireData = null;
-
-// Função para buscar e processar dados de queimadas da NASA
-async function getFireData() {
-
-
-  const NASA_API_KEY = "chaveRemovidaParaCommitGitHub";
-  const aDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split("T")[0];
-
-  const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${aDayAgo}`;
-
-  console.log("Buscando dados de queimadas...");
-
-  try {
-    const response = await fetch(apiUrl);
-    if (!response.ok) {
-      console.error("Erro ao buscar dados. Status:", response.status);
-      return [];
-    }
-    const csvText = await response.text();
-    const lines = csvText.split("\n");
-    const firePoints = [];
-    for (let i = 1; i < lines.length; i++) {
-      const columns = lines[i].split(",");
-      if (columns && columns.length > 1 && columns[0] && columns[1]) {
-        const lat = parseFloat(columns[0]);
-        const lon = parseFloat(columns[1]);
-        firePoints.push({ lat, lon });
-      }
-    }
-    console.log(`Encontrados ${firePoints.length} focos de incêndio.`);
-    return firePoints;
-  } catch (error) {
-    console.error("Falha na requisição para a API da NASA:", error);
-    return [];
-  }
-}
-
-// Converte latitude e longitude para um vetor de posição 3D na esfera
-function latLonToVector3(lat, lon, radius) {
-  const DEG_TO_RAD = THREE.MathUtils.DEG2RAD;
-  const phi = (90 - lat) * DEG_TO_RAD;
-  const theta = (lon + 180) * DEG_TO_RAD;
-
-  const x = -(radius * Math.sin(phi) * Math.cos(theta));
-  const y = radius * Math.cos(phi);
-  const z = radius * Math.sin(phi) * Math.sin(theta);
-
-  return new THREE.Vector3(x, y, z);
-}
-
-// --- VARIÁVEIS GLOBAIS ---
-let scene, camera, renderer, earth, clouds, firePointsGroup;
+let map, sparksLayer, heatLayer; // Variáveis de estado para o mapa
 const EARTH_RADIUS = 2;
 const DEG = THREE.MathUtils.degToRad;
 
-// --- 1. SETUP DO THREE.JS ---
-function initThree() {
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
-  camera.position.z = 5;
-
-  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById("webgl-container").appendChild(renderer.domElement);
-
-  const textureLoader = new THREE.TextureLoader();
-  const earthTexture = textureLoader.load("textures/earth_diffuse.jpg");
-  const specularTexture = textureLoader.load("textures/earth_specular.png");
-  const bumpTexture = textureLoader.load("textures/earth_bump.jpg");
-
-  const geometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
-  const earthMaterial = new THREE.MeshPhongMaterial({
-    map: earthTexture,
-    specularMap: specularTexture,
-    bumpMap: bumpTexture,
-    bumpScale: 0.05,
-    specular: new THREE.Color("grey"),
-    shininess: 15,
-  });
-
-  earth = new THREE.Mesh(geometry, earthMaterial);
-  scene.add(earth);
-
-  const cloudGeometry = new THREE.SphereGeometry(EARTH_RADIUS * 1.005, 64, 64);
-  const cloudTexture = textureLoader.load("textures/earth_clouds.png");
-  const cloudMaterial = new THREE.MeshStandardMaterial({
-    map: cloudTexture,
-    transparent: true,
-    opacity: 0.7,
-    blending: THREE.AdditiveBlending,
-  });
-
-  clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
-  earth.add(clouds);
-
-  const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
-  scene.add(ambientLight);
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1.1);
-  directionalLight.position.set(5, 3, 5);
-  scene.add(directionalLight);
-
-  function animate() {
-    requestAnimationFrame(animate);
-    if (clouds) {
-      clouds.rotation.y += 0.000015;
-    }
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+// --- FUNÇÕES DE DADOS E CONVERSÃO ---
+async function getFireData() {
+    const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d";
+    const aDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+    const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${aDayAgo}`;
+    console.log("Buscando dados de queimadas...");
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) { throw new Error(`Status: ${response.status}`); }
+        const csvText = await response.text();
+        if (csvText.includes("No fire alerts")) { return []; }
+        
+        const lines = csvText.split("\n").slice(1);
+        const firePoints = lines.map(line => {
+            const columns = line.split(",");
+            
+            if (columns && columns.length > 8 && columns[0] && columns[1] && columns[2] && columns[6] && columns[8]) {
+                const time = String(columns[6]).trim().padStart(4, '0');
+                const confidence = String(columns[8]).trim();
+                
+                if (confidence) { // Ignora a linha se a 'confiança' estiver vazia
+                    return { 
+                        lat: parseFloat(columns[0]), 
+                        lon: parseFloat(columns[1]),
+                        brightness: parseFloat(columns[2]),
+                        acq_time: `${time.slice(0, 2)}:${time.slice(2)} UTC`,
+                        confidence: confidence
+                    };
+                }
+            }
+            return null;
+        }).filter(p => p);
+        
+        console.log(`Encontrados ${firePoints.length} focos de incêndio.`);
+        return firePoints;
+    } catch (error) { console.error("Falha na requisição para a API da NASA:", error); return []; }
+}
+function latLonToVector3(lat, lon, radius) {
+    const phi = (90 - lat) * DEG;
+    const theta = (lon + 90) * DEG;
+    const x = -(radius * Math.sin(phi) * Math.cos(theta));
+    const y = radius * Math.cos(phi);
+    const z = radius * Math.sin(phi) * Math.sin(theta);
+    return new THREE.Vector3(x, y, z);
 }
 
-
-// ===================================================================
-// --- 2. SETUP DO SCROLLTRIGGER 
-// ===================================================================
-
-function setupScrollAnimation() {
-  gsap.registerPlugin(ScrollTrigger);
-
-  const fixedPanel = document.getElementById("fixed-context-panel");
-
-  // ----------------------------------------------------
-  // ANIMAÇÃO 1: Rotação para a AMÉRICA DO SUL
-  // ----------------------------------------------------
-  gsap.to(earth.rotation, {
-    x: DEG(-10),
-    y: DEG(-28),
-    scrollTrigger: {
-      trigger: "#america-sul",
-      start: "top top",
-      end: "bottom top",
-      scrub: true,
-      markers: true,
-    },
-  });
-
-  // ----------------------------------------------------
-  // ANIMAÇÃO 2: ZOOM no BRASIL
-  // apenas zoom da câmera.
-  // ----------------------------------------------------
-  gsap.to(camera.position, {
-    z: 3,
-    scrollTrigger: {
-      trigger: "#brasil",
-      start: "top center",
-      end: "bottom center",
-      scrub: true,
-      markers: true,
-    },
-  });
-
-  // ----------------------------------------------------
-  // EFEITO 3: Painel de Contexto do BRASIL
-  // apenas a aparição e desaparecimento do painel
-  // ----------------------------------------------------
-  ScrollTrigger.create({
-    trigger: "#brasil",
-    start: "top center",
-    end: "bottom center",
-    onEnter: () => {
-      gsap.to(fixedPanel, { opacity: 1, duration: 0.5, pointerEvents: 'auto' });
-    },
-    onLeave: () => {
-      gsap.to(fixedPanel, { opacity: 0, duration: 0.5, pointerEvents: 'none' });
-    },
-    onEnterBack: () => {
-      gsap.to(fixedPanel, { opacity: 1, duration: 0.5, pointerEvents: 'auto' });
-    },
-    onLeaveBack: () => {
-      gsap.to(fixedPanel, { opacity: 0, duration: 0.5, pointerEvents: 'none' });
+// --- SETUP DA CENA 3D ---
+function initThree() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 5;
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById("webgl-container").appendChild(renderer.domElement);
+    const textureLoader = new THREE.TextureLoader();
+    const earthMaterial = new THREE.MeshPhongMaterial({
+        map: textureLoader.load("textures/earth_diffuse.jpg"),
+        specularMap: textureLoader.load("textures/earth_specular.png"),
+        bumpMap: textureLoader.load("textures/earth_bump.jpg"),
+        bumpScale: 0.05, specular: new THREE.Color("grey"), shininess: 15,
+    });
+    const earthGeometry = new THREE.SphereGeometry(EARTH_RADIUS, 64, 64);
+    earth = new THREE.Mesh(earthGeometry, earthMaterial);
+    scene.add(earth);
+    const cloudMaterial = new THREE.MeshStandardMaterial({
+        map: textureLoader.load("textures/earth_clouds.png"),
+        transparent: true, opacity: 0.7, blending: THREE.AdditiveBlending,
+    });
+    const cloudGeometry = new THREE.SphereGeometry(EARTH_RADIUS * 1.005, 64, 64);
+    clouds = new THREE.Mesh(cloudGeometry, cloudMaterial);
+    earth.add(clouds);
+    const ambientLight = new THREE.AmbientLight(0x404040, 0.8);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    directionalLight.position.set(5, 3, 5);
+    scene.add(ambientLight, directionalLight);
+    function animate() {
+        requestAnimationFrame(animate);
+        clouds.rotation.y += 0.0001;
+        renderer.render(scene, camera);
     }
-  });
+    animate();
+    window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+}
 
+// --- SETUP DAS ANIMAÇÕES DE SCROLL ---
+function setupScrollAnimation() {
+    gsap.registerPlugin(ScrollTrigger);
 
-  // ----------------------------------------------------
-  // EFEITO 4: Visualização de Dados de QUEIMADAS
-  // ----------------------------------------------------
-  ScrollTrigger.create({
-    trigger: "#queimadas",
-    start: "top center",
-    end: "bottom center",
-    onEnter: async () => {
-      gsap.to(clouds.material, { opacity: 0, duration: 0.8 });
-      if (firePointsGroup) {
-        firePointsGroup.visible = true;
-        return;
-      }
-      if (!cachedFireData) {
-        cachedFireData = await getFireData();
-      }
-      firePointsGroup = new THREE.Group();
-      const fireDotSvgDataUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgdmlld0JveD0iMCAwIDEyOCAxMjgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHJhZGlhbEdyYWRpZW50IGlkPSJnbG93Ij48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIxIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSJ3aGl0ZSIgc3RvcC1vcGFjaXR5PSIwIi8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PGNpcmNsZSBjeD0iNjQiIGN5PSI2NCIgcj0iNjQiIGZpbGw9InVybCgjZ2xvdykiLz48L3N2Zz4=';
-      const fireTexture = new THREE.TextureLoader().load(fireDotSvgDataUrl);
-      const fireMaterial = new THREE.SpriteMaterial({
-        map: fireTexture,
-        color: 0xff4500,
-        blending: THREE.AdditiveBlending,
-        transparent: true,
-        opacity: 0.85,
-        sizeAttenuation: true,
-      });
-      cachedFireData.forEach((point) => {
-        const fireSprite = new THREE.Sprite(fireMaterial);
-        const position = latLonToVector3(point.lat, point.lon, EARTH_RADIUS * 1.002);
-        fireSprite.position.set(position.x, position.y, position.z);
-        fireSprite.scale.set(0.025, 0.025, 1);
-        firePointsGroup.add(fireSprite);
-      });
-      earth.add(firePointsGroup);
-    },
-    onLeaveBack: () => {
-      if (firePointsGroup) {
-        firePointsGroup.visible = false;
-      }
-      gsap.to(clouds.material, { opacity: 0.7, duration: 0.8 });
-    },
-  });
+    gsap.to(earth.rotation, {
+        x: DEG(-10), y: DEG(-28),
+        scrollTrigger: { trigger: "#america-sul", start: "top top", end: "bottom top", scrub: true, },
+    });
+    gsap.to(camera.position, {
+        z: 3,
+        scrollTrigger: { trigger: "#brasil", start: "top center", end: "bottom center", scrub: true, },
+    });
 
-  };
+    ScrollTrigger.create({
+        trigger: "#queimadas",
+        start: "top top",
+        onEnter: async () => {
+            if (map) return;
+            
+            gsap.timeline()
+                .to(camera.position, { z: 2.5, duration: 0.8, ease: "power2.in" })
+                .to("#webgl-container", { opacity: 0, duration: 0.5 }, "-=0.5")
+                .to("#map-container", { opacity: 1, visibility: 'visible', duration: 0.8 }, "-=0.3");
+            
+            if (!cachedFireData) { cachedFireData = await getFireData(); }
+            if (cachedFireData.length === 0) return;
+
+            map = L.map('map-container', { zoomControl: false }).setView([-14.235, -51.925], 5);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+            }).addTo(map);
+
+            sparksLayer = L.layerGroup().addTo(map);
+            const fireIcon = { color: '#f03', fillColor: '#f03', fillOpacity: 0.7, radius: 1, weight: 0 };
+            const batchSize = 500;
+            let currentIndex = 0;
+
+            function addSparkBatch() {
+                const batch = cachedFireData.slice(currentIndex, currentIndex + batchSize);
+                if (batch.length === 0) return;
+
+                batch.forEach(point => {
+                    const confidence = point.confidence || "N/A"; // <-- Pequena defesa extra
+                    let confidenceLabel = confidence.charAt(0).toUpperCase() + confidence.slice(1);
+                    if (confidenceLabel === 'Nominal') confidenceLabel = 'Normal';
+
+                    const popupContent = `<div class="fire-popup"><h4>Foco de Calor Detectado</h4><b>Hora:</b> ${point.acq_time}<br><b>Intensidade:</b> ${point.brightness} K<br><b>Confiança:</b> ${confidenceLabel}</div>`;
+
+                    L.circleMarker([point.lat, point.lon], fireIcon)
+                        .addTo(sparksLayer)
+                        .bindPopup(popupContent);
+                });
+
+                currentIndex += batchSize;
+                if (currentIndex < cachedFireData.length) {
+                    requestAnimationFrame(addSparkBatch);
+                }
+            }
+            addSparkBatch();
+
+            const counter = { value: 0 };
+            gsap.to(counter, {
+                duration: 4, value: cachedFireData.length, ease: "power1.out",
+                onUpdate: () => {
+                    document.getElementById('fire-counter').textContent = Math.round(counter.value).toLocaleString('pt-BR');
+                }
+            });
+        },
+        onLeaveBack: () => {
+            gsap.timeline()
+                .to("#map-container", { opacity: 0, duration: 0.5, onComplete: () => {
+                    if (map) { map.remove(); map = null; sparksLayer = null; heatLayer = null; }
+                }})
+                .set("#map-container", { visibility: 'hidden' })
+                .to("#webgl-container", { opacity: 1, duration: 0.8 }, "+=0.2")
+                .to(camera.position, { z: 3, duration: 1.0, ease: "power2.out" }, "<");
+        }
+    });
+
+    ScrollTrigger.create({
+        trigger: "#densidade",
+        start: "top center",
+        onEnter: () => {
+            if (!map || !cachedFireData || heatLayer) return;
+            console.log("Transição para Heatmap");
+
+            const heatData = cachedFireData.map(point => [point.lat, point.lon, 0.5]);
+            heatLayer = L.heatLayer(heatData, {
+                radius: 15, blur: 20, maxZoom: 11,
+                gradient: { 0.4: 'blue', 0.6: 'yellow', 0.8: 'red', 1.0: '#ff4500' }
+            }).addTo(map);
+            
+            gsap.timeline()
+                .to(sparksLayer.getLayers().map(l => l.getElement()), { duration: 1, opacity: 0, ease: "power2.inOut" })
+                .from(heatLayer.getElement(), { duration: 1.5, opacity: 0, ease: "power2.inOut" }, "<");
+        },
+        onLeaveBack: () => {
+            if (!sparksLayer || !heatLayer) return;
+            console.log("Voltando para os Pontos");
+            gsap.timeline()
+                .to(heatLayer.getElement(), { duration: 1, opacity: 0, onComplete: () => {
+                    if(map && heatLayer) { map.removeLayer(heatLayer); heatLayer = null; }
+                }})
+                .to(sparksLayer.getLayers().map(l => l.getElement()), { duration: 1.5, opacity: 0.7, ease: "power2.inOut" }, "<");
+        }
+    });
+    
+    document.querySelectorAll(".story-section").forEach(section => {
+        ScrollTrigger.create({
+            trigger: section,
+            start: "top 50%", end: "bottom 50%",
+            onToggle: self => gsap.to(section, { duration: 0.5, className: self.isActive ? 'story-section is-active' : 'story-section' })
+        });
+    });
+}
 
 initThree();
 setupScrollAnimation();
