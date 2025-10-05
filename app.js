@@ -261,7 +261,7 @@ function setupScrollAnimation() {
       } else {
         // CAMINHO LENTO: Primeiro carregamento, mostra animações.
         gsap.to(mapLoader, { opacity: 1, visibility: 'visible', duration: 0.5 });
-        mapLoaderText.textContent = "AQUIRINDO SINAL...";
+        mapLoaderText.textContent = "ACQUIRING SIGNAL...";
         document.getElementById("fire-counter").textContent = "---";
 
         const scanline = document.getElementById('scanline');
@@ -271,7 +271,7 @@ function setupScrollAnimation() {
           .to(scanline, { opacity: 0, duration: 0.5 }, "-=0.5");
 
         initialFireData = await getFireData(todayString);
-        mapLoaderText.textContent = "ANALISANDO DADOS...";
+        mapLoaderText.textContent = "ANALYZING DATA...";
         
         // Esconde o loader
         gsap.to(mapLoader, { opacity: 0, duration: 0.5, onComplete: () => mapLoader.style.visibility = 'hidden' });

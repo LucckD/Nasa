@@ -192,13 +192,13 @@ async function initFireRiskMap(mapId) {
         .addTo(map)
         .bindPopup(`
           <div class="fire-popup">
-            <h4>Região ${nomeRegiao}</h4>
-            <p><b>Índice FMA (Médio):</b> ${fmaMedio.toFixed(0)}</p>
-            <p><b>Nível de Perigo:</b> <span style="color:${cor}; font-weight:bold;">${perigo}</span></p>
+            <h4>${nomeRegiao} Region</h4>
+            <p><b>FMA Index (Avg):</b> ${fmaMedio.toFixed(0)}</p>
+            <p><b>Danger Level:</b> <span style="color:${cor}; font-weight:bold;">${perigo}</span></p>
             <hr style="border-color: #333; margin: 8px 0;">
             <p style="font-size: 0.8em; color: #aaa;">
-              🌡️ Temp. Média: ${tempMedia.toFixed(1)}°C<br>
-              💧 Umidade Média: ${umidadeMedia.toFixed(0)}%
+              🌡️ Avg. Temp: ${tempMedia.toFixed(1)}°C<br>
+              💧 Avg. Humidity: ${umidadeMedia.toFixed(0)}%
             </p>
           </div>
         `);
@@ -222,14 +222,14 @@ async function initFireRiskMap(mapId) {
   legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     const grades = [
-      { fma: 0,    label: 'Baixo',      range: '0 - 200' },
-      { fma: 201,  label: 'Médio',      range: '201 - 500' },
-      { fma: 501,  label: 'Alto',       range: '501 - 1000' },
-      { fma: 1001, label: 'Muito Alto', range: '1001 - 3000' },
-      { fma: 3001, label: 'Crítico',    range: '> 3000' },
+      { fma: 0,    label: 'Low',        range: '0 - 200' },
+      { fma: 201,  label: 'Medium',     range: '201 - 500' },
+      { fma: 501,  label: 'High',       range: '501 - 1000' },
+      { fma: 1001, label: 'Very High',  range: '1001 - 3000' },
+      { fma: 3001, label: 'Critical',   range: '> 3000' },
     ];
 
-    div.innerHTML = '<h4>Risco de Incêndio</h4>';
+    div.innerHTML = '<h4>Fire Risk</h4>';
     // Percorre os níveis de perigo e gera um rótulo com uma caixa colorida para cada um
     for (let i = 0; i < grades.length; i++) {
       const { cor } = getFmaInfo(grades[i].fma);
@@ -268,14 +268,14 @@ function createPulsatingIcon(lat, lon, options) {
 }
 
 function getThesisPopupContent(point, risk) {
-  let content = `<h4>Análise do Foco</h4>
+  let content = `<h4>Hotspot Analysis</h4>
     <p><b>Lat:</b> ${point.lat.toFixed(4)} | <b>Lon:</b> ${point.lon.toFixed(4)}</p>
     <hr style="border-color: #333; margin: 8px 0;">
-    <p><b>Risco de Propagação:</b> <span style="color:${risk.color}; font-weight:bold;">${risk.level}</span></p>`;
+    <p><b>Propagation Risk:</b> <span style="color:${risk.color}; font-weight:bold;">${risk.level}</span></p>`;
 
   if (point.weather) {
     content += `<p style="font-size: 0.9em; color: #aaa;">
-        💨 Vento: ${(point.weather.wind * 3.6).toFixed(1)} km/h<br>
+        💨 Wind: ${(point.weather.wind * 3.6).toFixed(1)} km/h<br>
         💧 Umidade: ${point.weather.humidity}%<br>
         🌡️ Temp: ${point.weather.temp}°C
       </p>`;
@@ -341,7 +341,7 @@ async function initThesisMap() {
     const loaderHTML = `
       <div id="thesis-map-loader" style="display: flex; justify-content: center; align-items: center; background-color: rgba(10, 15, 25, 0.7); backdrop-filter: blur(4px);">
         <div class="thesis-loader-content">
-          <p id="thesis-loader-text">Buscando focos de calor...</p>
+          <p id="thesis-loader-text">Fetching hotspots...</p>
           <div class="progress-bar-container"><div id="thesis-progress-bar" class="progress-bar"></div></div>
         </div>
       </div>
@@ -357,7 +357,7 @@ async function initThesisMap() {
     const progressBar = document.getElementById('thesis-progress-bar');
 
     if (allFireData.length === 0) {
-      mapContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #fff; font-size: 1.2rem;">Nenhum foco de calor detectado hoje para análise.</div>';
+      mapContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #fff; font-size: 1.2rem;">No hotspots detected today for analysis.</div>';
       return;
     }
 
@@ -366,7 +366,7 @@ async function initThesisMap() {
     const fireSample = allFireData.sort(() => 0.5 - Math.random()).slice(0, sampleSize);
 
     let pointsProcessed = 0;
-    loaderText.textContent = `Analisando 0 de ${fireSample.length} pontos...`;
+    loaderText.textContent = `Analyzing 0 of ${fireSample.length} hotspots...`;
 
     // Executa as requisições em paralelo, mas atualiza a UI progressivamente
     const promises = fireSample.map(point =>
@@ -398,7 +398,7 @@ async function initThesisMap() {
 
         // Atualiza a UI de progresso
         pointsProcessed++;
-        loaderText.textContent = `Analisando ${pointsProcessed} de ${fireSample.length} pontos...`;
+        loaderText.textContent = `Analyzing ${pointsProcessed} of ${fireSample.length} hotspots...`;
         progressBar.style.width = `${(pointsProcessed / fireSample.length) * 100}%`;
       })()
     );
@@ -417,11 +417,11 @@ async function initThesisMap() {
     thesisLegend.onAdd = function (map) {
       const div = L.DomUtil.create('div', 'info legend');
       div.innerHTML = `
-        <h4>Risco de Propagação</h4>
-        <div><i style="background: #d73027;"></i> Crítico <span class="legend-range">(Vento/Temp. altos, Umid. baixa)</span></div>
-        <div><i style="background: #fc8d59;"></i> Alto <span class="legend-range">(2 de 3 fatores de risco)</span></div>
-        <div><i style="background: #fee08b;"></i> Médio <span class="legend-range">(1 de 3 fatores de risco)</span></div>
-        <div><i style="background: #91cf60;"></i> Baixo <span class="legend-range">(Condições favoráveis)</span></div>
+        <h4>Propagation Risk</h4>
+        <div><i style="background: #d73027;"></i> Critical <span class="legend-range">(High Wind/Temp, Low Hum.)</span></div>
+        <div><i style="background: #fc8d59;"></i> High <span class="legend-range">(2 of 3 risk factors)</span></div>
+        <div><i style="background: #fee08b;"></i> Medium <span class="legend-range">(1 of 3 risk factors)</span></div>
+        <div><i style="background: #91cf60;"></i> Low <span class="legend-range">(Favorable conditions)</span></div>
       `;
       return div;
     };
@@ -455,7 +455,7 @@ function initInpeDeforestationMap() {
       data: {
         labels: prodesData.labels,
         datasets: [{
-          label: 'Área Desmatada (km²)',
+          label: 'Deforested Area (km²)',
           data: prodesData.values,
           backgroundColor: 'rgba(26, 35, 126, 0.7)',
           borderColor: 'rgba(57, 73, 171, 1)',
@@ -473,19 +473,17 @@ function initInpeDeforestationMap() {
             titleFont: { size: 16, weight: 'bold' },
             bodyFont: { size: 14 },
             callbacks: {
-              label: function(context) {
-                return `Área: ${context.parsed.y.toLocaleString('pt-BR')} km²`;
-              }
+              label: (context) => `Area: ${context.parsed.y.toLocaleString('en-US')} km²`,
             }
           }
         },
         scales: {
           y: {
             beginAtZero: true,
-            title: { display: true, text: 'Área Desmatada (km²)', color: '#333' }
+            title: { display: true, text: 'Deforested Area (km²)', color: '#333' }
           },
           x: {
-            title: { display: true, text: 'Ano', color: '#333' }
+            title: { display: true, text: 'Year', color: '#333' }
           }
         }
       }
