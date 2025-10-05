@@ -583,3 +583,90 @@ time-slider::-webkit-slider-thumb {
   border-radius: 4px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
+
+/* --- CONTROLES DE MÚSICA FLUTUANTES --- */
+#music-controls {
+  /* Posicionamento Fixo */
+  position: fixed;
+  top: 25px;
+  right: 25px;
+  z-index: 9999; /* Garante que fique acima de quase tudo */
+
+  /* Visual (Glassmorphism) */
+  background-color: rgba(10, 15, 25, 0.6); /* Fundo escuro semitransparente */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Para compatibilidade com Safari */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50px; /* Deixa com formato de pílula */
+  padding: 8px 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+
+  /* Layout Interno */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* Espaço entre os botões */
+}
+
+#music-controls button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease;
+}
+
+#music-controls button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#music-controls button:active {
+  transform: scale(0.9); /* Efeito de clique */
+}
+
+/* Os ícones SVG dentro dos botões */
+#music-controls button svg {
+  width: 20px;
+  height: 20px;
+  fill: #e0e0e0; /* Cor dos ícones */
+}
+
+#music-controls button:hover svg {
+  fill: #ffffff;
+}
+
+/* --- LÓGICA DE TROCA DE ÍCONE PLAY/PAUSE --- */
+
+/* Por padrão, o ícone de pause fica escondido */
+#play-pause-btn .pause-icon {
+  display: none;
+}
+
+/* Quando o botão tiver a classe 'playing', esconde o play e mostra o pause */
+#play-pause-btn.playing .play-icon {
+  display: none;
+}
+
+#play-pause-btn.playing .pause-icon {
+  display: block;
+}
+
+#fogo {
+  width: 100%;
+  padding: 5rem 0;
+  background-color: #0a0f19;
+  color: var(--text-color);
+  font-family: 'Poppins', sans-serif;
+}
+
+.fogo-texto {
+  width: 90%;
+  max-width: 850px;
+  margin: 0 auto 4rem auto;
+  text-align: center;
+}
