@@ -1,14 +1,12 @@
 // --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
 let scene, camera, renderer, earth, clouds, ominousLight;
-const dataCache = new Map(); // Cache para armazenar dados de diferentes dias
+const dataCache = new Map();
 let map, sparksLayer, heatLayer;
-let isHeatmapVisible = false; // Flag para controlar a visão atual do mapa
+let isHeatmapVisible = false;
 const EARTH_RADIUS = 2;
 const DEG = THREE.MathUtils.degToRad;
 
 // --- FUNÇÕES DE DADOS E CONVERSÃO ---
-
-// Função parametrizada para buscar dados de um dia específico
 async function getFireData(targetDateString) {
   const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d";
   const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${targetDateString}`;
@@ -85,7 +83,7 @@ function updateMapWithPoints(fireData) {
   function addSparkBatch() {
     const batch = fireData.slice(currentIndex, currentIndex + batchSize);
     if (batch.length === 0) {
-      toggleBtn.disabled = false; // Reabilita se não houver dados
+      toggleBtn.disabled = false;
       return;
     }
     batch.forEach((point) => {
@@ -95,7 +93,7 @@ function updateMapWithPoints(fireData) {
     if (currentIndex < fireData.length) {
       requestAnimationFrame(addSparkBatch);
     } else {
-      toggleBtn.disabled = false; // Reabilita o botão no final
+      toggleBtn.disabled = false;
     }
   }
   addSparkBatch();
@@ -174,16 +172,14 @@ function initThree() {
   });
 }
 
-// --- SETUP DAS ANIMAÇÕES DE SCROLL ---
 function setupScrollAnimation() {
   gsap.registerPlugin(ScrollTrigger);
 
-  // LÓGICA PARA ESCONDER O AVISO DE SCROLL
   const scrollPrompt = document.getElementById("scroll-prompt");
   ScrollTrigger.create({
-    start: 1, // Começa 1 pixel depois do topo
-    onEnter: () => gsap.to(scrollPrompt, { autoAlpha: 0 }), // Desaparece com o primeiro scroll
-    once: true, // Executa apenas uma vez
+    start: 1,
+    onEnter: () => gsap.to(scrollPrompt, { autoAlpha: 0 }),
+    once: true,
   });
 
   gsap.to(earth.rotation, {
@@ -206,7 +202,6 @@ function setupScrollAnimation() {
     },
   });
 
-  // Gatilho principal para a seção de Análise de Dados
   ScrollTrigger.create({
     trigger: "#analise-dados",
     start: "top top",
@@ -315,7 +310,6 @@ function setupScrollAnimation() {
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
-          // Mostra "Carregando..." ao buscar novos dados pelo slider
           document.getElementById("fire-counter").textContent = "Carregando...";
 
           const fireData = await getFireData(selectedDateString);

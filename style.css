@@ -405,6 +405,92 @@ time-slider::-webkit-slider-thumb {
   box-shadow: 0 8px G40px rgba(0, 0, 0, 0.15); 
 }
 
+/* --- Estilos para a Seção de Comparação SAR --- */
+#desmatamento-sar {
+  padding: 6rem 2rem;
+  background-color: #f4f6f8; /* Um fundo claro para destacar as imagens */
+  color: #333;
+  text-align: center;
+}
+
+.comparison-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.comparison-content h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1a237e; /* Um azul escuro para o título */
+  margin-bottom: 1.5rem;
+}
+
+.comparison-content p {
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.8;
+  color: #555;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-bottom: 4rem;
+}
+
+.image-item {
+  background-color: #fff;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.image-item h3 {
+  font-size: 1.5rem;
+  color: #1a237e;
+  margin-bottom: 1rem;
+}
+
+.image-item img {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.gif-container {
+  margin-top: 2rem;
+}
+
+.gif-container h3 {
+  font-size: 2rem;
+  color: #1a237e;
+  margin-bottom: 1rem;
+}
+
+.gif-container img {
+  max-width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.info.legend {
+  background: rgba(26, 28, 36, 0.8);
+  backdrop-filter: blur(5px);
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
 #toggle-view-btn:disabled {
     background-color: #555;
     cursor: not-allowed;
@@ -413,4 +499,87 @@ time-slider::-webkit-slider-thumb {
 
 #toggle-view-btn:disabled:hover {
     background-color: #555;
+}
+
+.inpe-container {
+    width: 100%;
+    max-width: 400px; /* Ajuste conforme necessário */
+    margin-top: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    overflow: hidden; /* Essencial para o corte */
+}
+
+#inpe-map-image {
+    display: block;
+    width: 100%;
+}
+
+#load-interactive-map-btn {
+    margin-top: 1.5rem;
+    background-color: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+#load-interactive-map-btn:hover {
+    background-color: #008fcc;
+}
+
+#sar-rio {
+  width: 100%;
+  padding: 5rem 0;
+  background-color: #0a0f19;
+  color: var(--text-color);
+  font-family: 'Poppins', sans-serif;
+}
+
+.sar-texto {
+  width: 90%;
+  max-width: 750px;
+  margin: 0 auto 4rem auto;
+  text-align: center;
+}
+
+.sar-texto h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  line-height: 1.2;
+  position: relative;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sar-texto h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background-color: var(--accent-color);
+  border-radius: 2px;
+}
+
+.sar-texto p {
+  font-size: 1.1rem;
+  color: #bbbbbb;
+  line-height: 1.8;
+  margin-bottom: 1.5rem;
+}
+
+#mapa-sar-container {
+  width: 90%;
+  max-width: 1400px;
+  height: 75vh;
+  margin: 0 auto;
+  border-radius: 4px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }

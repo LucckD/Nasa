@@ -1,2 +1,5 @@
 //Musica de espaço enquanto estiver na tela do globo
-//PRA CALCULAR RISCO DE CHUVA É USADO UM MAPA DE PRECIPITAÇÃO *mapa* 
+//Mouse hover no mapa de calor?
+//Deixar mais animado/vivo
+//tela de carregamento para evitar q a terra apareça sem nuvens
+//tentar evitar os bugs ao scrollar pra cima (terra girando demais)
