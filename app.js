@@ -304,17 +304,7 @@ function setupScrollAnimation() {
 
       // Show initial view (points) and animate counter
       updateMapWithPoints(initialFireData);
-      const counter = { value: 0 };
-      gsap.to(counter, {
-        duration: 2,
-        value: initialFireData.length,
-        ease: "power2.out",
-        onUpdate: () => {
-          document.getElementById("fire-counter").textContent = Math.round(
-            counter.value
-          ).toLocaleString("en-US");
-        },
-      });
+      updateCounter(initialFireData.length);
 
       const toggleBtn = document.getElementById("toggle-view-btn");
       toggleBtn.addEventListener("click", () => {
@@ -366,8 +356,7 @@ function setupScrollAnimation() {
           document.getElementById("fire-counter").textContent = "Loading...";
 
           const fireData = await getFireData(selectedDateString);
-          document.getElementById("fire-counter").textContent =
-            fireData.length.toLocaleString("en-US");
+          updateCounter(fireData.length);
           if (isHeatmapVisible) {
             updateMapWithHeatmap(fireData);
           } else {
@@ -375,6 +364,20 @@ function setupScrollAnimation() {
           }
         }, 250);
       });
+
+      function updateCounter(value) {
+        const counterElement = document.getElementById("fire-counter");
+        const startValue = parseInt(counterElement.textContent.replace(/,/g, '') || 0);
+        const counterObj = { value: startValue };
+        gsap.to(counterObj, {
+          duration: 1.5,
+          value: value,
+          ease: "power2.out",
+          onUpdate: () => {
+            counterElement.textContent = Math.round(counterObj.value).toLocaleString("en-US");
+          },
+        });
+      }
     },
     onLeaveBack: () => {
       gsap.to(ominousLight, { intensity: 0, duration: 1 });
@@ -509,5 +512,3 @@ function setupHomeButton() {
 
 initThree();
 setupScrollAnimation();
-// setupHomeButton(); // Desativado conforme solicitado
-// ...existing code...

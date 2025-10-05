@@ -182,12 +182,12 @@ async function initFireRiskMap(mapId) {
 
       const { cor, perigo } = getFmaInfo(fmaMedio);
 
-      L.circleMarker([regiao.coords.lat, regiao.coords.lon], {
-        radius: 10, // Raio menor, em pixels
+      const circle = L.circleMarker([regiao.coords.lat, regiao.coords.lon], {
+        radius: 12, // Raio um pouco maior para melhor interação
         color: "#111", // Cor do contorno
         fillColor: cor,
         fillOpacity: 0.8,
-        weight: 2, // Espessura do contorno
+        weight: 2.5, // Contorno mais destacado
       })
         .addTo(map)
         .bindPopup(`
@@ -202,6 +202,15 @@ async function initFireRiskMap(mapId) {
             </p>
           </div>
         `);
+
+      // Adiciona interatividade no hover
+      circle.on('mouseover', function (e) {
+        this.openPopup();
+        this.setStyle({ weight: 4, radius: 14 }); // Destaca ao passar o mouse
+      });
+      circle.on('mouseout', function (e) {
+        this.setStyle({ weight: 2.5, radius: 12 }); // Volta ao normal
+      });
     } catch (err) {
       console.error(`Erro ao processar dados para a região ${nomeRegiao}:`, err);
     }
@@ -243,10 +252,10 @@ function calculatePropagationRisk(weather) {
   if (humidity < 40) score++; // Umidade baixa
   if (temp > 30) score++;     // Temperatura alta
 
-  if (score >= 3) return { level: 'Critical', color: '#d73027', radius: 8, pulsating: true };
-  if (score === 2) return { level: 'High', color: '#fc8d59', radius: 7, pulsating: false };
+  if (score >= 3) return { level: 'Critical', color: '#d73027', radius: 12, pulsating: true }; // Raio bem maior
+  if (score === 2) return { level: 'High', color: '#fc8d59', radius: 9, pulsating: false };
   if (score === 1) return { level: 'Medium', color: '#fee08b', radius: 6, pulsating: false };
-  return { level: 'Low', color: '#91cf60', radius: 5, pulsating: false };
+  return { level: 'Low', color: '#91cf60', radius: 4, pulsating: false }; // Raio menor
 }
 
 function createPulsatingIcon(lat, lon, options) {
@@ -308,7 +317,6 @@ async function initThesisMap() {
     console.warn("Contêiner do mapa da tese não encontrado.");
     return;
   }
-  mapContainer.innerHTML = '<div id="thesis-map-loader" style="display: flex; justify-content: center; align-items: center; height: 100%; color: #fff; font-size: 1.2rem;">Analisando dados...</div>';
 
   const thesisMap = L.map(mapContainer, {
     zoomControl: false,
@@ -329,50 +337,81 @@ async function initThesisMap() {
 
   // Garante que o mapa esteja pronto antes de carregar os dados
   thesisMap.whenReady(async () => {
-    const allFireData = await getThesisFireData();
-    
+    // CRIA E ADICIONA O LOADER DEPOIS QUE O MAPA ESTÁ PRONTO
+    const loaderHTML = `
+      <div id="thesis-map-loader" style="display: flex; justify-content: center; align-items: center; background-color: rgba(10, 15, 25, 0.7); backdrop-filter: blur(4px);">
+        <div class="thesis-loader-content">
+          <p id="thesis-loader-text">Buscando focos de calor...</p>
+          <div class="progress-bar-container"><div id="thesis-progress-bar" class="progress-bar"></div></div>
+        </div>
+      </div>
+    `;
+    mapContainer.insertAdjacentHTML('beforeend', loaderHTML);
+
+
+    // OTIMIZAÇÃO: Reutiliza a função getFireData que usa o cache.
+    const today = new Date().toISOString().split("T")[0];
+    const allFireData = await getFireData(today);
     const loader = document.getElementById('thesis-map-loader');
-    if (loader) loader.style.display = 'none';
+    const loaderText = document.getElementById('thesis-loader-text');
+    const progressBar = document.getElementById('thesis-progress-bar');
 
     if (allFireData.length === 0) {
       mapContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #fff; font-size: 1.2rem;">Nenhum foco de calor detectado hoje para análise.</div>';
       return;
     }
 
-    // Para não sobrecarregar a API, analisamos uma amostra de 150 pontos
+    // Analisamos uma amostra para não sobrecarregar a API
     const sampleSize = 250;
     const fireSample = allFireData.sort(() => 0.5 - Math.random()).slice(0, sampleSize);
 
-    const promises = fireSample.map(async (point) => {
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${point.lat.toFixed(2)}&longitude=${point.lon.toFixed(2)}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&wind_speed_unit=ms`;
-      try {
-        const response = await fetch(weatherUrl);
-        const weatherData = await response.json();
-        if (weatherData && weatherData.current) {
-          point.weather = {
-            temp: weatherData.current.temperature_2m,
-            humidity: weatherData.current.relative_humidity_2m,
-            wind: weatherData.current.wind_speed_10m,
-          };
+    let pointsProcessed = 0;
+    loaderText.textContent = `Analisando 0 de ${fireSample.length} pontos...`;
+
+    // Executa as requisições em paralelo, mas atualiza a UI progressivamente
+    const promises = fireSample.map(point =>
+      (async () => {
+        try {
+          const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${point.lat.toFixed(2)}&longitude=${point.lon.toFixed(2)}&current=temperature_2m,relative_humidity_2m,wind_speed_10m&wind_speed_unit=ms`;
+          const response = await fetch(weatherUrl);
+          const weatherData = await response.json();
+
+          if (weatherData && weatherData.current) {
+            point.weather = {
+              temp: weatherData.current.temperature_2m,
+              humidity: weatherData.current.relative_humidity_2m,
+              wind: weatherData.current.wind_speed_10m,
+            };
+
+            // Adiciona o ponto ao mapa assim que os dados chegam
+            const risk = calculatePropagationRisk(point.weather);
+            const popupContent = getThesisPopupContent(point, risk);
+            if (risk.pulsating) {
+              createPulsatingIcon(point.lat, point.lon, risk).bindPopup(popupContent).addTo(thesisMap);
+            } else {
+              L.circleMarker([point.lat, point.lon], { color: risk.color, radius: risk.radius, fillOpacity: 0.9, weight: 1, stroke: true, fill: true }).bindPopup(popupContent).addTo(thesisMap);
+            }
+          }
+        } catch (err) {
+          console.error("Falha ao buscar dados de tempo para o ponto:", point, err);
         }
-      } catch (e) {
-        console.error("Falha ao buscar dados de tempo:", e);
-      }
-      return point;
-    });
 
-    const enrichedPoints = await Promise.all(promises);
+        // Atualiza a UI de progresso
+        pointsProcessed++;
+        loaderText.textContent = `Analisando ${pointsProcessed} de ${fireSample.length} pontos...`;
+        progressBar.style.width = `${(pointsProcessed / fireSample.length) * 100}%`;
+      })()
+    );
 
-    enrichedPoints.forEach(point => {
-      const risk = calculatePropagationRisk(point.weather);
-      const popupContent = getThesisPopupContent(point, risk);
+    // Espera todas as promessas terminarem antes de esconder o loader
+    await Promise.all(promises);
 
-      if (risk.pulsating) {
-        createPulsatingIcon(point.lat, point.lon, risk).bindPopup(popupContent).addTo(thesisMap);
-      } else {
-        L.circleMarker([point.lat, point.lon], { color: risk.color, radius: risk.radius, fillOpacity: 0.9, weight: 1, stroke: true, fill: true }).bindPopup(popupContent).addTo(thesisMap);
-      }
-    });
+    // Animação de fade-out para o loader
+    if (loader) {
+      loader.style.transition = 'opacity 0.5s ease-out';
+      loader.style.opacity = '0';
+      setTimeout(() => loader.remove(), 500);
+    }
 
     const thesisLegend = L.control({ position: 'bottomright' });
     thesisLegend.onAdd = function (map) {
