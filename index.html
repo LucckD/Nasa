@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Visualização de Queimadas na Amazônia</title>
+  <title>Amazon Fire Hotspot Visualization</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="shortcut icon" href="img/space_orange@.png" type="image/x-icon">
@@ -17,20 +17,20 @@
 <body>
   <header class="site-header">
     <div class="header-content">
-      <!-- Espaço reservado para manter o layout, pode ser usado para um título no futuro -->
+      <!-- Placeholder to keep layout; can be used for a title later -->
       <div></div>
       <div class="top-right-controls">
         <a href="#" class="site-logo">
-          <img src="img/space_orange@.png" alt="Logo do projeto">
+          <img src="img/space_orange@.png" alt="Project logo">
           <span>FireWatch</span>
         </a>
         <div id="music-controls">
-          <button id="volume-down-btn" aria-label="Diminuir volume"><svg viewBox="0 0 24 24"><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"></path></svg></button>
-          <button id="play-pause-btn" aria-label="Tocar/Pausar música">
+          <button id="volume-down-btn" aria-label="Decrease volume"><svg viewBox="0 0 24 24"><path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"></path></svg></button>
+          <button id="play-pause-btn" aria-label="Play/Pause music">
             <svg class="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
             <svg class="pause-icon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path></svg>
           </button>
-          <button id="volume-up-btn" aria-label="Aumentar volume"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
+          <button id="volume-up-btn" aria-label="Increase volume"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path></svg></button>
         </div>
       </div>
     </div>
@@ -42,203 +42,175 @@
     <div class="mouse">
       <div class="wheel"></div>
     </div>
-    <span>Role para explorar</span>
+    <span>Scroll to explore</span>
   </div>
 
   <main>
     <div class="story-panel">
-    <section id="introducao" class="story-section">
+      <section id="introducao" class="story-section">
         <div class="content">
-        <h2>O Planeta Sob Ameaça</h2>
-        <p>
-          Esta é uma jornada interativa que utiliza dados de satélite para
-          visualizar um dos problemas ambientais mais urgentes do nosso tempo.
-          Role para começar.
-        </p>
-      </div>
-    </section>
+          <h2>Planet Under Threat</h2>
+          <p>
+            This is an interactive journey using satellite data to visualize one of the most urgent environmental problems of our time.
+            Scroll to begin.
+          </p>
+        </div>
+      </section>
 
       <section id="america-sul" class="story-section">
-      <div class="content">
-        <h2>Foco na América do Sul</h2>
-        <p>
-          Nossa análise se concentra na América do Sul, uma região de
-          biodiversidade incomparável, mas que enfrenta desafios ambientais
-          significativos, especialmente na Bacia Amazônica.
-        </p>
-      </div>
-    </section>
+        <div class="content">
+          <h2>Focus on South America</h2>
+          <p>
+            Our analysis focuses on South America, a region of unparalleled biodiversity facing major environmental challenges, especially in the Amazon Basin.
+          </p>
+        </div>
+      </section>
 
       <section id="brasil" class="story-section">
-      <div class="content">
-        <h2>Um Olhar Sobre o Brasil</h2>
-        <p>
-          O Brasil abriga a maior parte da Floresta Amazônica. À medida que
-          nos aproximamos, a escala da floresta se torna evidente, assim como
-          sua vulnerabilidade.
-        </p>
-      </div>
-    </section>
+        <div class="content">
+          <h2>A Look at Brazil</h2>
+          <p>
+            Brazil contains most of the Amazon rainforest. As we zoom in, the scale of the forest and its vulnerability become clear.
+          </p>
+        </div>
+      </section>
 
       <section id="analise-dados" class="story-section">
-      <div class="content">
-        <h2>Análise dos Dados</h2>
-        <h3><span id="fire-counter">0</span> focos detectados</h3>
-        <p>
-          Explore os focos de incêndio detectados pelos satélites da NASA.
-          Arraste o slider para viajar no tempo e visualizar os dados de cada
-          um dos últimos 7 dias.
-        </p>
+        <div class="content">
+          <h2>Data Analysis</h2>
+          <h3><span id="fire-counter">0</span> detected hotspots</h3>
+          <p>
+            Explore fire hotspots detected by NASA satellites. Drag the slider to travel through time and view data from each of the last 7 days.
+          </p>
 
-        <div id="timeslider-container">
-          <input type="range" min="0" max="6" value="6" id="time-slider" />
-          <div class="labels">
-            <span id="start-date-label">7 dias atrás</span>
-            <strong id="current-date-label">Hoje</strong>
+          <div id="timeslider-container">
+            <input type="range" min="0" max="6" value="6" id="time-slider" />
+            <div class="labels">
+              <span id="start-date-label">7 days ago</span>
+              <strong id="current-date-label">Today</strong>
+            </div>
+          </div>
+
+          <div id="view-toggle-container">
+            <button id="toggle-view-btn">Analyze Density</button>
+            <button id="about-data-btn">Learn More About the Data</button>
           </div>
         </div>
-
-        <div id="view-toggle-container">
-          <button id="toggle-view-btn">Analisar Densidade</button>
-          <button id="about-data-btn">Saiba Mais Sobre os Dados</button>
-        </div>
-      </div>
-    </section>
+      </section>
 
       <section id="conclusao" class="story-section">
-      <div class="content">
-        <h2>Consciência e Ação</h2>
-        <p>
-          Visualizar os dados é o primeiro passo. A conscientização gerada por
-          essas tecnologias é fundamental para impulsionar ações de
-          conservação e políticas de proteção ambiental mais eficazes.
-        </p>
-      </div>
-    </section>
+        <div class="content">
+          <h2>Awareness and Action</h2>
+          <p>
+            Visualizing data is the first step. Awareness created by these technologies is essential to drive conservation actions and more effective environmental policies.
+          </p>
+        </div>
+      </section>
     </div>
 
-    <!-- O conteúdo estático começa aqui, fora da parte da história -->
+    <!-- Static content starts here -->
     <div class="static-content">
-    <section id="fogo">
-      <div class="fogo-texto">
-        <iframe src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f" width="100%" height="500px"
+      <section id="fogo">
+        <div class="fogo-texto">
+          <iframe src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f" width="100%" height="500px"
             frameborder="0" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
-      </div>
-    </section>
+        </div>
+      </section>
 
-    <section id="desmatamento-sar">
-      <div class="comparison-content">
-        <h2>Impacto Visível: Desmatamento em Rondônia</h2>
-        <p>
-          Imagens de Radar (SAR) revelam a expansão da agricultura e o padrão "espinha de peixe" do desmatamento ao longo
-          de décadas. As áreas em roxo/rosa representam a floresta intacta, enquanto verde/amarelo indicam áreas
-          desmatadas.
-        </p>
-        <div class="image-grid">
-          <div class="image-item">
-            <h3>ANTES (1992)</h3>
-            <img src="img/2001Sar.jpg" alt="Imagem SAR de Rondônia em 1992 mostrando menos desmatamento">
-          </div>
-          <div class="image-item">
-            <h3>DEPOIS (2018)</h3>
-            <img src="img/2019Sar.jpg" alt="Imagem SAR de Rondônia em 2018 mostrando desmatamento avançado">
-          </div>
-        </div>
-        <div class="gif-container">
-          <h3>Evolução Anual (2013-2018)</h3>
-          <p>A animação abaixo, com dados do satélite Landsat, mostra a progressão anual do desmatamento na mesma região.
-          </p>
-          <img src="img/desflorestamento-2013-to-2018.gif" alt="Animação do desmatamento em Rondônia de 2013 a 2018">
-        </div>
-        <!-- Gráfico removido como solicitado -->
-        <div class="inpe-container">
-          <h3>Explore os Dados de Desmatamento (INPE)</h3>
+      <section id="desmatamento-sar">
+        <div class="comparison-content">
+          <h2>Visible Impact: Deforestation in Rondônia</h2>
           <p>
-            Clique no botão abaixo para ver a evolução da taxa anual de desmatamento na Amazônia Legal, medida em km² pelo projeto PRODES do INPE.
+            Radar images (SAR) reveal agricultural expansion and the "fishbone" pattern of deforestation over decades. Purple/pink indicates intact forest, while green/yellow shows cleared areas.
           </p>
-          <button id="load-deforestation-chart-btn">Ver Gráfico Anual</button>
-          <div id="chart-container" style="display: none; position: relative; height: 400px; width: 100%; margin-top: 2rem;">
+          <div class="image-grid">
+            <div class="image-item">
+              <h3>BEFORE (1992)</h3>
+              <img src="img/2001Sar.jpg" alt="SAR image of Rondônia in 1992 showing less deforestation">
+            </div>
+            <div class="image-item">
+              <h3>AFTER (2018)</h3>
+              <img src="img/2019Sar.jpg" alt="SAR image of Rondônia in 2018 showing advanced deforestation">
+            </div>
+          </div>
+          <div class="gif-container">
+            <h3>Annual Evolution (2013-2018)</h3>
+            <p>The animation below, using Landsat data, shows annual progression of deforestation in the same region.</p>
+            <img src="img/desflorestamento-2013-to-2018.gif" alt="Deforestation animation in Rondônia 2013-2018">
+          </div>
+          <div class="inpe-container">
+            <h3>Explore Deforestation Data (INPE)</h3>
+            <p>
+              Click the button below to see the annual deforestation trend in the Legal Amazon in km² as measured by INPE's PRODES project.
+            </p>
+            <button id="load-deforestation-chart-btn">View Annual Chart</button>
+            <div id="chart-container" style="display: none; position: relative; height: 400px; width: 100%; margin-top: 2rem;">
               <canvas id="deforestation-chart"></canvas>
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-    
-    <section id="sar-rio">
-      <div class="sar-texto">
-        <h2>Previsão de Risco: O Próximo Passo</h2>
-        <p>
-          Além de monitorar focos existentes, podemos usar dados de satélite para <strong>prever futuras áreas de
-            risco</strong>.
-          Combinando informações como a umidade do solo, vegetação e dados de precipitação acumulada, como os do mapa
-          abaixo, é possível aplicar modelos de previsão.
-        </p>
-        <p>Um exemplo é a <strong>Fórmula de Monte Alegre (FMA)</strong>, que calcula um índice de perigo de incêndio com
-          base nesses fatores, nos ajudando a antecipar e a agir preventivamente.</p>
-        <img src="img/SMEC_prec_acum_ams_2025100400z_108z.png" alt="Mapa de precipitação acumulada do INPE"
-          style="max-width: 100%; border-radius: 8px; margin-top: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-      </div>
-      <div id="mapa-sar-container"></div>
-    </section>
+      </section>
 
-    <section id="nossa-contribuicao">
-      <div class="contribuicao-texto">
-        <h2>Nossa Contribuição: Do Monitoramento à Prevenção</h2>
-        <p>
-          A visualização de dados é poderosa, mas a verdadeira inovação está em usá-los para prever e agir. Nossa tese é que a <strong>interseção entre áreas de desmatamento recente e condições climáticas de alto risco</strong> cria "zonas de ignição" com altíssima probabilidade de incêndios.
-        </p>
-        <p>
-          O mapa abaixo cruza esses dados: a camada de <strong>Risco de Fogo (INPE)</strong> com os polígonos de <strong>Desmatamento de 2022 (INPE)</strong>. As áreas onde o desmatamento recente (em magenta) encontra o risco crítico de fogo (vermelho) são os nossos <strong>alertas preditivos</strong>. É aqui que os recursos de prevenção devem ser focados.
-        </p>
-      </div>
-      <div id="tese-map-container"></div>
-    </section>
+      <section id="sar-rio">
+        <div class="sar-texto">
+          <h2>Risk Forecast: The Next Step</h2>
+          <p>
+            Beyond monitoring current hotspots, we can use satellite data to predict future risk areas. Combining soil moisture, vegetation, and cumulative precipitation maps (such as the one below), models can forecast risk.
+          </p>
+          <p>The <strong>Monte Alegre Formula (FMA)</strong> is one example that computes a fire danger index based on these factors, helping anticipate and proactively act.</p>
+          <img src="img/SMEC_prec_acum_ams_2025100400z_108z.png" alt="Accumulated precipitation map"
+            style="max-width: 100%; border-radius: 8px; margin-top: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+        </div>
+        <div id="mapa-sar-container"></div>
+      </section>
+
+      <section id="nossa-contribuicao">
+        <div class="contribuicao-texto">
+          <h2>Our Contribution: From Monitoring to Prevention</h2>
+          <p>
+            Visualization is powerful, but real innovation lies in using data to predict and act. Our thesis is that the intersection of recent deforestation areas and high-risk climatic conditions creates ignition zones with a very high probability of fire.
+          </p>
+          <p>
+            The map below crosses the <strong>INPE Fire Risk</strong> layer with <strong>2022 Deforestation Polygons</strong> (INPE). Areas where recent deforestation (magenta) meets critical fire risk (red) are our predictive alerts. These are the locations where prevention resources should be focused.
+          </p>
+        </div>
+        <div id="tese-map-container"></div>
+      </section>
     </div>
   </main>
 
   <div id="data-modal" class="modal-overlay">
     <div class="modal-content">
       <button id="close-modal-btn" class="close-btn">&times;</button>
-      <h3>Sobre a Fonte dos Dados</h3>
+      <h3>About the Data Source</h3>
       <p>
-        Os dados de focos de calor são fornecidos quase em tempo real pelo
-        sistema
-        <strong>FIRMS (Fire Information for Resource Management System)</strong>
-        da NASA.
+        Heat hotspot data is provided almost in real time by NASA's
+        <strong>FIRMS (Fire Information for Resource Management System)</strong>.
       </p>
 
-      <h4>Satélite e Sensor</h4>
+      <h4>Satellite & Sensor</h4>
       <p>
-        Utilizamos os dados do sensor <strong>VIIRS</strong> a bordo do
-        satélite Suomi NPP, que possui uma resolução espacial de
-        aproximadamente 375 metros.
+        We use data from the <strong>VIIRS</strong> sensor aboard the Suomi NPP satellite, with approximately 375m spatial resolution.
       </p>
 
-      <h4>Precisão e "Fogo na Água"</h4>
-      <p>É importante notar duas características destes dados:</p>
+      <h4>Accuracy and "Fire at Sea"</h4>
+      <p>Note two important characteristics of these data:</p>
       <ul>
         <li>
-          <strong>Margem de Erro:</strong> Devido à resolução, um incêndio
-          costeiro pode ter suas coordenadas reportadas ligeiramente mar
-          adentro.
+          <strong>Location uncertainty:</strong> Due to resolution, a coastal fire may appear slightly offshore.
         </li>
         <li>
-          <strong>Falsos Positivos:</strong> O sensor detecta calor intenso,
-          não fogo. Por isso, a queima de gás em
-          <strong>plataformas de petróleo</strong> em alto-mar é
-          frequentemente classificada como um foco de incêndio, explicando a
-          maioria dos pontos sobre o oceano.
+          <strong>False positives:</strong> The sensor detects intense heat, not flames. Offshore gas flaring on <strong>oil platforms</strong> is frequently reported as hotspots, explaining many ocean points.
         </li>
       </ul>
     </div>
   </div>
 
-  <!-- Música de fundo -->
-
+  <!-- Background music -->
   <audio id="background-music" src="sound/somEspaco.mp3" loop></audio>
 
   <footer class="site-footer">
-    <p>Desenvolvido para o NASA International Space Apps Challenge.</p>
+    <p>Developed for the NASA International Space Apps Challenge.</p>
   </footer>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>

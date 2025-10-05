@@ -1,57 +1,58 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Inicializa o mapa de risco de incêndio na seção correspondente
+  // Initialize the fire risk map in its section
   const fireRiskMapContainer = document.getElementById("mapa-sar-container");
   if (fireRiskMapContainer) { initFireRiskMap("mapa-sar-container"); }
 
-  // Inicializa a lógica para o mapa de desmatamento do INPE
+  // Initialize INPE deforestation chart logic
   initInpeDeforestationMap();
 
-  // Inicializa o mapa da TESE na seção final
+  // Initialize the thesis map in the final section
   initThesisMap();
 });
 
 async function initFireRiskMap(mapId) {
-  // Define os limites geográficos para o Brasil
+  // Geographic bounds for Brazil
   const brazilBounds = L.latLngBounds(
-    L.latLng(-34, -74), // Canto Sudoeste
-    L.latLng(6, -34)    // Canto Nordeste
+    L.latLng(-34, -74), // Southwest corner
+    L.latLng(6, -34)    // Northeast corner
   );
 
   const map = L.map(mapId, {
-    zoomControl: false,       // Remove os botões de +/- zoom
-    scrollWheelZoom: false,   // Desativa o zoom pela roda do mouse
-    doubleClickZoom: false,   // Desativa o zoom por duplo clique
-    dragging: false,          // Desativa o arrastar do mapa
-    touchZoom: false,         // Desativa o "pinch-to-zoom" em telas de toque
-    minZoom: 4,               // Trava o zoom mínimo
-    maxZoom: 4,               // Trava o zoom máximo
-    maxBounds: brazilBounds,  // Restringe a visão a estes limites
-    maxBoundsViscosity: 1.0   // Torna os limites "sólidos"
+    zoomControl: false,       // Remove +/- zoom buttons
+    scrollWheelZoom: false,   // Disable wheel zoom
+    doubleClickZoom: false,   // Disable double-click zoom
+    dragging: false,          // Disable map dragging
+    touchZoom: false,         // Disable pinch-to-zoom on touch
+    minZoom: 4,               // Lock min zoom
+    maxZoom: 4,               // Lock max zoom
+    maxBounds: brazilBounds,  // Restrict view to these bounds
+    maxBoundsViscosity: 1.0   // Make bounds 'solid'
   }).setView([-15.78, -47.93], 4);
-  // Trocando o mapa escuro por um de satélite para um visual mais rico
+
+  // Use satellite tiles for richer visuals
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   }).addTo(map);
 
-  // Carregar e exibir as divisões dos estados
+  // Load and display state boundaries
   const estadosPane = map.createPane('estadosPane');
-  estadosPane.style.zIndex = 250; // Z-index baixo para ficar no fundo
+  estadosPane.style.zIndex = 250; // Lower z-index so it's in the background
 
   const estadosUrl = 'https://raw.githubusercontent.com/fititnt/gis-dataset-brasil/main/uf/geojson/uf.json';
   try {
     const response = await fetch(estadosUrl);
     const estadosData = await response.json();
     L.geoJSON(estadosData, {
-      pane: 'estadosPane', // Garante que a camada fique no painel de fundo
+      pane: 'estadosPane', // Ensure layer is on the background pane
       style: {
-        color: 'rgba(255, 255, 255, 0.6)', // Linha branca semi-transparente
+        color: 'rgba(255, 255, 255, 0.6)', // semi-transparent white line
         weight: 1.5,
-        fillOpacity: 0.0 // Sem preenchimento
+        fillOpacity: 0.0 // no fill
       }
     }).addTo(map);
-    console.log("Camada de estados carregada no fundo do mapa.");
+    console.log("States layer loaded in map background.");
   } catch (err) {
-    console.error("Erro ao carregar o GeoJSON dos estados:", err);
+    console.error("Error loading states GeoJSON:", err);
   }
 
   const regioes = {
@@ -98,13 +99,13 @@ async function initFireRiskMap(mapId) {
   };
 
   /**
-   * Calcula o Índice de Risco de Incêndio usando a Fórmula de Monte Alegre (FMA).
-   * A FMA é um índice ACUMULADO. Ele aumenta a cada dia sem chuva.
+   * Calculate the Monte Alegre Fire Danger Index (FMA).
+   * FMA is an ACCUMULATED index that increases for each day without significant rain.
    * FMA = Σ (100 - H) * N
-   * H: Umidade Relativa do ar às 13h (%).
-   * N: Coeficiente que depende do número de dias (n) sem chuva > 2.5mm.
-   *    - N é incrementado em 0.1 para cada dia 'n' sem chuva, até um máximo de 2.0.
-   *    - O índice é zerado se ocorrer chuva > 12.7mm.
+   * H: Relative humidity at 13:00 (%).
+   * N: Coefficient depending on number of consecutive dry days (> 2.5mm).
+   *    - N increments by 0.1 per dry day, up to 2.0.
+   *    - Index resets to zero if rainfall > 12.7mm occurs.
    */
   function calcularFMA(dailyPrecipitation, hourlyHumidity) {
     let fmaAcumulado = 0;
@@ -113,7 +114,7 @@ async function initFireRiskMap(mapId) {
     for (let i = 0; i < dailyPrecipitation.length; i++) {
       const chuvaDoDia = dailyPrecipitation[i];
 
-      // Zera o índice se a chuva for muito forte
+      // Reset index if heavy rain occurs
       if (chuvaDoDia > 12.7) {
         fmaAcumulado = 0;
         diasSemChuva = 0;
@@ -121,15 +122,15 @@ async function initFireRiskMap(mapId) {
       }
 
       if (chuvaDoDia > 2.5) {
-        diasSemChuva = 0; // Zera a contagem de dias secos
+        diasSemChuva = 0; // Reset dry day count
       } else {
         diasSemChuva++;
       }
 
-      const umidade13h = hourlyHumidity[i * 24 + 13]; // Pega a umidade às 13h do dia
+      const umidade13h = hourlyHumidity[i * 24 + 13]; // humidity at 13:00
       if (umidade13h === undefined || umidade13h === null) continue;
 
-      const N = Math.min(1.0 + diasSemChuva * 0.1, 2.0); // Coeficiente N
+      const N = Math.min(1.0 + diasSemChuva * 0.1, 2.0); // coefficient N
       const fmaDiario = (100 - umidade13h) * N;
 
       fmaAcumulado += fmaDiario;
@@ -139,16 +140,16 @@ async function initFireRiskMap(mapId) {
   }
 
   function getFmaInfo(fma) {
-    if (fma > 3000) return { cor: "#d73027", perigo: "Crítico" };
-    if (fma > 1000) return { cor: "#fc8d59", perigo: "Muito Alto" };
-    if (fma > 500) return { cor: "#fee08b", perigo: "Alto" };
-    if (fma > 200) return { cor: "#ffffbf", perigo: "Médio" };
-    return { cor: "#91cf60", perigo: "Baixo" };
+    if (fma > 3000) return { cor: "#d73027", perigo: "Critical" };
+    if (fma > 1000) return { cor: "#fc8d59", perigo: "Very High" };
+    if (fma > 500) return { cor: "#fee08b", perigo: "High" };
+    if (fma > 200) return { cor: "#ffffbf", perigo: "Moderate" };
+    return { cor: "#91cf60", perigo: "Low" };
   }
 
   const hoje = new Date();
   const dataInicio = new Date();
-  dataInicio.setDate(hoje.getDate() - 30); // Busca dados dos últimos 30 dias
+  dataInicio.setDate(hoje.getDate() - 30); // Fetch last 30 days of data
 
   const hojeStr = hoje.toISOString().split("T")[0];
   const inicioStr = dataInicio.toISOString().split("T")[0];
@@ -186,45 +187,45 @@ async function initFireRiskMap(mapId) {
       const { cor, perigo } = getFmaInfo(fmaMedio);
 
       L.circleMarker([regiao.coords.lat, regiao.coords.lon], {
-        radius: 10, // Raio menor, em pixels
-        color: "#111", // Cor do contorno
+        radius: 10,
+        color: "#111",
         fillColor: cor,
         fillOpacity: 0.8,
-        weight: 2, // Espessura do contorno
+        weight: 2,
       })
         .addTo(map)
         .bindPopup(`
           <div class="fire-popup">
-            <h4>Região ${nomeRegiao}</h4>
-            <p><b>Índice FMA (Médio):</b> ${fmaMedio.toFixed(0)}</p>
-            <p><b>Nível de Perigo:</b> <span style="color:${cor}; font-weight:bold;">${perigo}</span></p>
+            <h4>Region ${nomeRegiao}</h4>
+            <p><b>FMA Index (Avg):</b> ${fmaMedio.toFixed(0)}</p>
+            <p><b>Risk Level:</b> <span style="color:${cor}; font-weight:bold;">${perigo}</span></p>
             <hr style="border-color: #333; margin: 8px 0;">
             <p style="font-size: 0.8em; color: #aaa;">
-              🌡️ Temp. Média: ${tempMedia.toFixed(1)}°C<br>
-              💧 Umidade Média: ${umidadeMedia.toFixed(0)}%
+              🌡️ Avg Temp: ${tempMedia.toFixed(1)}°C<br>
+              💧 Avg Humidity: ${umidadeMedia.toFixed(0)}%
             </p>
           </div>
         `);
     } catch (err) {
-      console.error(`Erro ao processar dados para a região ${nomeRegiao}:`, err);
+      console.error(`Error processing data for region ${nomeRegiao}:`, err);
     }
   }
 
-  // Adiciona a legenda de risco de incêndio ao mapa
+  // Add fire risk legend to the map
   const legend = L.control({ position: 'bottomright' });
 
   legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     const grades = [
-      { fma: 0,    label: 'Baixo',      range: '0 - 200' },
-      { fma: 201,  label: 'Médio',      range: '201 - 500' },
-      { fma: 501,  label: 'Alto',       range: '501 - 1000' },
-      { fma: 1001, label: 'Muito Alto', range: '1001 - 3000' },
-      { fma: 3001, label: 'Crítico',    range: '> 3000' },
+      { fma: 0,    label: 'Low',       range: '0 - 200' },
+      { fma: 201,  label: 'Moderate',  range: '201 - 500' },
+      { fma: 501,  label: 'High',      range: '501 - 1000' },
+      { fma: 1001, label: 'Very High', range: '1001 - 3000' },
+      { fma: 3001, label: 'Critical',  range: '> 3000' },
     ];
 
-    div.innerHTML = '<h4>Risco de Incêndio</h4>';
-    // Percorre os níveis de perigo e gera um rótulo com uma caixa colorida para cada um
+    div.innerHTML = '<h4>Fire Risk</h4>';
+    // Iterate levels and create colored label for each
     for (let i = 0; i < grades.length; i++) {
       const { cor } = getFmaInfo(grades[i].fma);
       div.innerHTML += `
@@ -239,89 +240,89 @@ async function initFireRiskMap(mapId) {
 async function initThesisMap() {
   const mapContainer = document.getElementById("tese-map-container");
   if (!mapContainer) {
-    console.warn("Contêiner para o mapa da tese não encontrado.");
+    console.warn("Container for thesis map not found.");
     return;
   }
 
-  const thesisMap = L.map(mapContainer).setView([-10.8, -62.5], 6); // Foco em Rondônia
+  const thesisMap = L.map(mapContainer).setView([-10.8, -62.5], 6); // Focus on Rondônia
 
-  // Camada de Mapa Base (Satélite)
+  // Base map layer (satellite)
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri'
   }).addTo(thesisMap);
 
-  // Camada de Risco de Fogo do INPE (WMS)
+  // INPE Fire Risk WMS layer
   const wmsUrl = 'https://terrabrasilis.dpi.inpe.br/geoserver/terrabrasilis/wms';
   const fireRiskLayer = L.tileLayer.wms(wmsUrl, {
       layers: 'terrabrasilis:risco_fogo_previsto',
       format: 'image/png',
       transparent: true,
       opacity: 0.6,
-      attribution: 'Risco de Fogo &copy; INPE'
+      attribution: 'Fire Risk &copy; INPE'
   });
 
-  // Camada de Polígonos de Desmatamento (GeoJSON local)
+  // Deforestation polygons (local GeoJSON variable desmatamentoRO2022)
   const deforestationLayer = L.geoJSON(desmatamentoRO2022, {
     style: {
-      color: "#ff00ff", // Magenta para alto contraste
+      color: "#ff00ff", // magenta for contrast
       weight: 1.5,
       fillOpacity: 0.4
     },
     onEachFeature: (feature, layer) => {
       const areaKm = (feature.properties.areakm).toFixed(2);
-      layer.bindPopup(`<div class="fire-popup"><h4>Área Desmatada (2022)</h4><p><b>Área:</b> ${areaKm} km²</p></div>`);
+      layer.bindPopup(`<div class="fire-popup"><h4>Deforested Area (2022)</h4><p><b>Area:</b> ${areaKm} km²</p></div>`);
     }
   });
 
-  // Adiciona as camadas ao controle
+  // Add layers to layer control
   const overlayMaps = {
-    "<span style='color: #ff00ff;'>Desmatamento (2022)</span>": deforestationLayer,
-    "Risco de Fogo (INPE)": fireRiskLayer
+    "<span style='color: #ff00ff;'>Deforestation (2022)</span>": deforestationLayer,
+    "Fire Risk (INPE)": fireRiskLayer
   };
 
-  // Adiciona as camadas ao mapa por padrão
+  // Add layers by default
   fireRiskLayer.addTo(thesisMap);
   deforestationLayer.addTo(thesisMap);
 
   L.control.layers(null, overlayMaps, { collapsed: false }).addTo(thesisMap);
 
-  // Adiciona uma legenda customizada para a tese
+  // Add a custom legend for the thesis map
   const thesisLegend = L.control({ position: 'bottomright' });
   thesisLegend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     div.innerHTML = `
-      <h4>Legenda da Análise</h4>
-      <div><i style="background: #ff00ff; opacity: 0.7;"></i> Desmatamento (2022)</div>
+      <h4>Analysis Legend</h4>
+      <div><i style="background: #ff00ff; opacity: 0.7;"></i> Deforestation (2022)</div>
       <hr style="border-color: #444; margin: 8px 0;">
-      <strong>Risco de Fogo</strong><br>
-      <div><i style="background: #d73027;"></i> Crítico</div>
-      <div><i style="background: #fc8d59;"></i> Muito Alto</div>
-      <div><i style="background: #fee08b;"></i> Alto</div>
-      <div><i style="background: #91cf60;"></i> Baixo</div>
+      <strong>Fire Risk</strong><br>
+      <div><i style="background: #d73027;"></i> Critical</div>
+      <div><i style="background: #fc8d59;"></i> Very High</div>
+      <div><i style="background: #fee08b;"></i> High</div>
+      <div><i style="background: #91cf60;"></i> Low</div>
     `;
     return div;
   };
   thesisLegend.addTo(thesisMap);
 
-  // Adiciona os contornos dos estados para contexto
+  // Add state boundaries for context
   const estadosUrl = 'https://raw.githubusercontent.com/fititnt/gis-dataset-brasil/main/uf/geojson/uf.json';
   try {
     const response = await fetch(estadosUrl);
     const estadosData = await response.json();
     L.geoJSON(estadosData, { style: { color: 'rgba(255, 255, 255, 0.7)', weight: 1, fillOpacity: 0.0 } }).addTo(thesisMap);
   } catch (err) {
-    console.error("Erro ao carregar o GeoJSON dos estados:", err);
+    console.error("Error loading states GeoJSON:", err);
   }
 }
 
 function initInpeDeforestationMap() {
-  // Função limpa após a remoção do gráfico.
+  // Setup for the PRODES chart (runs when button clicked)
   const loadBtn = document.getElementById('load-deforestation-chart-btn');
   const chartContainer = document.getElementById('chart-container');
   const ctx = document.getElementById('deforestation-chart');
 
   if (!loadBtn || !chartContainer || !ctx) {
-    console.warn("Elementos para o gráfico de desmatamento não encontrados.");
+    console.warn("Elements for the deforestation chart not found.");
     return;
   }
 
@@ -329,7 +330,7 @@ function initInpeDeforestationMap() {
     loadBtn.style.display = 'none';
     chartContainer.style.display = 'block';
 
-    // Dados do PRODES (INPE) - Taxa de desmatamento (km²) na Amazônia Legal
+    // PRODES (INPE) deforestation data - deforested area (km²) in the Legal Amazon
     const prodesData = {
       labels: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
       values: [5012, 6207, 7893, 6947, 7536, 10129, 10851, 13038, 11594, 9001]
@@ -340,7 +341,7 @@ function initInpeDeforestationMap() {
       data: {
         labels: prodesData.labels,
         datasets: [{
-          label: 'Área Desmatada (km²)',
+          label: 'Deforested Area (km²)',
           data: prodesData.values,
           backgroundColor: 'rgba(26, 35, 126, 0.7)',
           borderColor: 'rgba(57, 73, 171, 1)',
@@ -359,7 +360,7 @@ function initInpeDeforestationMap() {
             bodyFont: { size: 14 },
             callbacks: {
               label: function(context) {
-                return `Área: ${context.parsed.y.toLocaleString('pt-BR')} km²`;
+                return `Area: ${context.parsed.y.toLocaleString('en-US')} km²`;
               }
             }
           }
@@ -367,15 +368,15 @@ function initInpeDeforestationMap() {
         scales: {
           y: {
             beginAtZero: true,
-            title: { display: true, text: 'Área Desmatada (km²)', color: '#333' }
+            title: { display: true, text: 'Deforested Area (km²)', color: '#333' }
           },
           x: {
-            title: { display: true, text: 'Ano', color: '#333' }
+            title: { display: true, text: 'Year', color: '#333' }
           }
         }
       }
     });
 
-    console.log("Gráfico de desmatamento inicializado.");
+    console.log("Deforestation chart initialized.");
   });
 }

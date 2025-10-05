@@ -1,4 +1,5 @@
-// --- VARIÁVEIS GLOBAIS E CONFIGURAÇÃO ---
+// ...existing code...
+// --- GLOBAL VARIABLES & CONFIG ---
 let scene, camera, renderer, earth, clouds, ominousLight;
 const dataCache = new Map();
 let map, sparksLayer, heatLayer;
@@ -6,15 +7,15 @@ let isHeatmapVisible = false;
 const EARTH_RADIUS = 2;
 const DEG = THREE.MathUtils.degToRad;
 
-// --- FUNÇÕES DE DADOS E CONVERSÃO ---
+// --- DATA & CONVERSION FUNCTIONS ---
 async function getFireData(targetDateString) {
   const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d";
   const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${targetDateString}`;
 
-  console.log(`Buscando dados de queimadas para o dia ${targetDateString}...`);
+  console.log(`Fetching fire data for date ${targetDateString}...`);
   try {
     if (dataCache.has(targetDateString)) {
-      console.log("Dados encontrados no cache.");
+      console.log("Data found in cache.");
       return dataCache.get(targetDateString);
     }
 
@@ -40,17 +41,17 @@ async function getFireData(targetDateString) {
       .filter((p) => p);
 
     console.log(
-      `Encontrados ${firePoints.length} focos para ${targetDateString}.`
+      `Found ${firePoints.length} hotspots for ${targetDateString}.`
     );
     dataCache.set(targetDateString, firePoints);
     return firePoints;
   } catch (error) {
-    console.error("Falha na requisição para a API da NASA:", error);
+    console.error("Failed request to NASA API:", error);
     return [];
   }
 }
 
-// Converte coordenadas para o espaço 3D
+// Convert lat/lon to 3D space
 function latLonToVector3(lat, lon, radius) {
   const phi = (90 - lat) * DEG;
   const theta = (lon + 90) * DEG;
@@ -60,7 +61,7 @@ function latLonToVector3(lat, lon, radius) {
   return new THREE.Vector3(x, y, z);
 }
 
-// Função para desenhar os pontos individuais no mapa
+// Function to draw individual points on the map
 function updateMapWithPoints(fireData) {
   if (!sparksLayer) {
     sparksLayer = L.layerGroup().addTo(map);
@@ -99,7 +100,7 @@ function updateMapWithPoints(fireData) {
   addSparkBatch();
 }
 
-// Função para desenhar o mapa de calor
+// Function to draw the heatmap
 function updateMapWithHeatmap(fireData) {
   if (heatLayer) {
     heatLayer.remove();
@@ -113,7 +114,7 @@ function updateMapWithHeatmap(fireData) {
   }).addTo(map);
 }
 
-// --- SETUP DA CENA 3D ---
+// --- 3D SCENE SETUP ---
 function initThree() {
   scene = new THREE.Scene();
   camera = new THREE.PerspectiveCamera(
@@ -218,10 +219,10 @@ function setupScrollAnimation() {
           "-=0.3"
         );
 
-      // Mostra a mensagem de carregamento inicial
-      document.getElementById("fire-counter").textContent = "Carregando...";
+      // Show initial loading message
+      document.getElementById("fire-counter").textContent = "Loading...";
 
-      // Busca os dados do dia atual
+      // Fetch today's data
       const todayString = new Date().toISOString().split("T")[0];
       const initialFireData = await getFireData(todayString);
 
@@ -237,7 +238,7 @@ function setupScrollAnimation() {
         });
       }
 
-      // Inicializa o mapa
+      // Initialize the map
       map = L.map("map-container", { zoomControl: false }).setView(
         [-14.235, -51.925],
         5
@@ -249,7 +250,7 @@ function setupScrollAnimation() {
         }
       ).addTo(map);
 
-      // Mostra a visão inicial (pontos) e anima o contador
+      // Show initial view (points) and animate counter
       updateMapWithPoints(initialFireData);
       const counter = { value: 0 };
       gsap.to(counter, {
@@ -259,7 +260,7 @@ function setupScrollAnimation() {
         onUpdate: () => {
           document.getElementById("fire-counter").textContent = Math.round(
             counter.value
-          ).toLocaleString("pt-BR");
+          ).toLocaleString("en-US");
         },
       });
 
@@ -277,11 +278,11 @@ function setupScrollAnimation() {
           updateMapWithPoints(fireData);
         }
         toggleBtn.textContent = isHeatmapVisible
-          ? "Mostrar Pontos Individuais"
-          : "Analisar Densidade";
+          ? "Show Individual Points"
+          : "Analyze Density";
       });
 
-      // Lógica do slider de tempo
+      // Time slider logic
       const slider = document.getElementById("time-slider");
       const currentDateLabel = document.getElementById("current-date-label");
       const startDateLabel = document.getElementById("start-date-label");
@@ -292,29 +293,29 @@ function setupScrollAnimation() {
         return date.toISOString().split("T")[0];
       });
       const formatDateLabel = (dateString) =>
-        new Date(dateString + "T12:00:00").toLocaleDateString("pt-BR", {
+        new Date(dateString + "T12:00:00").toLocaleDateString("en-US", {
           day: "2-digit",
           month: "short",
         });
 
       startDateLabel.textContent = formatDateLabel(dates[0]);
-      currentDateLabel.textContent = "Hoje";
+      currentDateLabel.textContent = "Today";
 
       let debounceTimer;
       slider.addEventListener("input", (event) => {
         const selectedDateString = dates[event.target.value];
         currentDateLabel.textContent =
           event.target.value == 6
-            ? "Hoje"
+            ? "Today"
             : formatDateLabel(selectedDateString);
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
-          document.getElementById("fire-counter").textContent = "Carregando...";
+          document.getElementById("fire-counter").textContent = "Loading...";
 
           const fireData = await getFireData(selectedDateString);
           document.getElementById("fire-counter").textContent =
-            fireData.length.toLocaleString("pt-BR");
+            fireData.length.toLocaleString("en-US");
           if (isHeatmapVisible) {
             updateMapWithHeatmap(fireData);
           } else {
@@ -343,7 +344,7 @@ function setupScrollAnimation() {
     },
   });
 
-  // Animação dos painéis de texto
+  // Animate story panels
   document.querySelectorAll(".story-section").forEach((section) => {
     ScrollTrigger.create({
       trigger: section,
@@ -372,7 +373,7 @@ function setupScrollAnimation() {
 
   openBtn.addEventListener("click", openModal);
   closeBtn.addEventListener("click", closeModal);
-  // Fecha o modal se clicar fora do conteúdo
+  // Close modal when clicking outside content
   modal.addEventListener("click", (event) => {
     if (event.target === modal) {
       closeModal();
@@ -382,3 +383,4 @@ function setupScrollAnimation() {
 
 initThree();
 setupScrollAnimation();
+// ...existing code...
