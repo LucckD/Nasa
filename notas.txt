@@ -1,5 +1,2 @@
-//Nâo permitir Zoom In ou Zoom Out no mapa/site
-//implementar enchentes?
 //Musica de espaço enquanto estiver na tela do globo
-//Não permitir apertar o botão de Analisar Densidade enquanto as bolinhas não forem 100% carregadas
-//Botão de saber mais sobre um incêndio especifico
+//PRA CALCULAR RISCO DE CHUVA É USADO UM MAPA DE PRECIPITAÇÃO *mapa* 

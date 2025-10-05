@@ -114,7 +114,7 @@ body {
 #hotzone-panel {
     position: fixed;
     top: 20px;
-    right: -300px; /* Começa fora da tela */
+    right: -300px; 
     width: 250px;
     padding: 20px;
     background: rgba(255, 69, 0, 0.8);
@@ -151,7 +151,6 @@ body {
     display: block; 
 }
 
-/* Estilização do Slider de Tempo */
 #timeslider-container {
     margin-top: 2rem;
     width: 100%;
@@ -267,9 +266,6 @@ time-slider::-webkit-slider-thumb {
     100% { top: 8px; opacity: 1; }
 }
 
-/* Adicione no final do seu style.css */
-
-/* Botão "Saiba Mais" */
 #about-data-btn {
     margin-top: 2rem;
     background-color: transparent;
@@ -341,4 +337,80 @@ time-slider::-webkit-slider-thumb {
     color: white;
     font-size: 2rem;
     cursor: pointer;
+}
+
+#prevencao {
+  width: 100%;
+  padding: 5rem 0; 
+  background-color: #FFFFFF; 
+  color: #333333; 
+  font-family: 'Poppins', sans-serif; 
+}
+
+.prevencao-texto {
+  width: 90%; 
+  max-width: 750px;
+  margin: 0 auto 4rem auto;
+  text-align: center;
+}
+
+.prevencao-texto h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #00796B;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  position: relative;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem; 
+}
+
+.prevencao-texto h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px; 
+  background-color: #00796B; 
+  border-radius: 2px;
+}
+
+.prevencao-texto p {
+  font-size: 1.1rem;
+  color: #555555;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+}
+
+.prevencao-texto .data-atualizacao {
+  font-size: 0.9rem;
+  color: #888888;
+  display: block;
+}
+
+#mapa-prevencao-container {
+  width: 90%;
+  max-width: 1400px;
+  height: 75vh;
+  margin: 0 auto;
+  border-radius: 4px; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#mapa-prevencao-container:hover {
+  transform: scale(1.015); 
+  box-shadow: 0 8px G40px rgba(0, 0, 0, 0.15); 
+}
+
+#toggle-view-btn:disabled {
+    background-color: #555;
+    cursor: not-allowed;
+    transform: translateY(0);
+}
+
+#toggle-view-btn:disabled:hover {
+    background-color: #555;
 }

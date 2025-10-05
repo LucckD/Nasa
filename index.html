@@ -10,6 +10,7 @@
   <link rel="shortcut icon" href="img/space_orange@.png" type="image/x-icon">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
@@ -89,42 +90,6 @@
       </div>
     </section>
 
-      <section id="conclusao" class="story-section">
-        <div class="content">
-          <h2>Consciência e Ação</h2>
-          <p>
-            Visualizar os dados é o primeiro passo. A conscientização gerada por
-            essas tecnologias é fundamental para impulsionar ações de
-            conservação e políticas de proteção ambiental mais eficazes.
-          </p>
-        </div>
-      </section>
-
-      <section id="antes-depois" class="story-section">
-        <div class="content">
-          <h2>A Cicatriz na Floresta (Dados SAR)</h2>
-          <p>
-            Estas imagens de <strong>Radar de Abertura Sintética (SAR)</strong>,
-            do satélite Sentinel-1, mostram uma área em Rondônia, Brasil. A
-            tecnologia SAR nos permite ver através de nuvens e fumaça. Arraste o
-            slider para comparar a mesma região entre 2020 e 2021 e veja a
-            "cicatriz" roxa do desmatamento se expandir.
-          </p>
-
-          <image-compare-viewer>
-            <img
-              slot="image-1"
-              src="textures/sar_antes.jpg"
-              alt="Rondônia em 2020 (SAR)"
-            />
-            <img
-              slot="image-2"
-              src="textures/sar_depois.jpg"
-              alt="Rondônia em 2021 (SAR)"
-            />
-          </image-compare-viewer>
-        </div>
-      </section>
     <section id="conclusao" class="story-section">
       <div class="content">
         <h2>Consciência e Ação</h2>
@@ -136,6 +101,7 @@
       </div>
     </section>
 
+    <div id="final-content">
     <section id="mapaDeFogo">
       <div class="content">
         <iframe src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f" width="100%" height="500px"
@@ -143,6 +109,17 @@
       </div>
     </section>
   </main>
+
+  <section id="prevencao">
+     <iframe 
+      src="https://terrabrasilis.dpi.inpe.br/queimadas/bdqueimadas/" 
+      width="100%" 
+      height="600" 
+      style="border:0;" 
+      allowfullscreen="" 
+      loading="lazy">
+  </iframe>
+    </section>
 
   <div id="data-modal" class="modal-overlay">
     <div class="modal-content">
@@ -186,15 +163,10 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
 
     <script src="app.js"></script>
-
-<footer>
-    <p> &copy; Desenvolvido por EchoSpace - 2025</p>
-</footer>
-
-  </body>
-  <script src="app.js"></script>
+    <script src="mapa_inpe.js"></script>
 </body>
 
 </html>

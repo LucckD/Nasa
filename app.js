@@ -10,7 +10,7 @@ const DEG = THREE.MathUtils.degToRad;
 
 // Função parametrizada para buscar dados de um dia específico
 async function getFireData(targetDateString) {
-  const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d"; // Sua chave da API
+  const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d";
   const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${targetDateString}`;
 
   console.log(`Buscando dados de queimadas para o dia ${targetDateString}...`);
@@ -69,6 +69,9 @@ function updateMapWithPoints(fireData) {
   }
   sparksLayer.clearLayers();
 
+  const toggleBtn = document.getElementById("toggle-view-btn");
+  toggleBtn.disabled = true;
+
   const fireIcon = {
     color: "#f03",
     fillColor: "#f03",
@@ -81,13 +84,18 @@ function updateMapWithPoints(fireData) {
 
   function addSparkBatch() {
     const batch = fireData.slice(currentIndex, currentIndex + batchSize);
-    if (batch.length === 0) return;
+    if (batch.length === 0) {
+      toggleBtn.disabled = false; // Reabilita se não houver dados
+      return;
+    }
     batch.forEach((point) => {
       L.circleMarker([point.lat, point.lon], fireIcon).addTo(sparksLayer);
     });
     currentIndex += batchSize;
     if (currentIndex < fireData.length) {
       requestAnimationFrame(addSparkBatch);
+    } else {
+      toggleBtn.disabled = false; // Reabilita o botão no final
     }
   }
   addSparkBatch();
@@ -154,7 +162,7 @@ function initThree() {
 
   function animate() {
     requestAnimationFrame(animate);
-    clouds.rotation.y += 0.0001;
+    clouds.rotation.y += 0.000050;
     renderer.render(scene, camera);
   }
   animate();
@@ -215,6 +223,9 @@ function setupScrollAnimation() {
           "-=0.3"
         );
 
+      // Mostra a mensagem de carregamento inicial
+      document.getElementById("fire-counter").textContent = "Carregando...";
+
       // Busca os dados do dia atual
       const todayString = new Date().toISOString().split("T")[0];
       const initialFireData = await getFireData(todayString);
@@ -257,10 +268,9 @@ function setupScrollAnimation() {
         },
       });
 
-      // Lógica do botão de alternância
       const toggleBtn = document.getElementById("toggle-view-btn");
       toggleBtn.addEventListener("click", () => {
-        isHeatmapVisible = !isHeatmapVisible; // Inverte o estado
+        isHeatmapVisible = !isHeatmapVisible;
         const fireData = dataCache.get(dates[slider.value]) || [];
 
         if (isHeatmapVisible) {
@@ -305,6 +315,9 @@ function setupScrollAnimation() {
 
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
+          // Mostra "Carregando..." ao buscar novos dados pelo slider
+          document.getElementById("fire-counter").textContent = "Carregando...";
+
           const fireData = await getFireData(selectedDateString);
           document.getElementById("fire-counter").textContent =
             fireData.length.toLocaleString("pt-BR");
