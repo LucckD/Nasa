@@ -1,9 +1,7 @@
-// ...existing code...
-// --- GLOBAL VARIABLES & CONFIG ---
-let scene, camera, renderer, earth, clouds, ominousLight;
+let scene, camera, renderer, earth, clouds, ominousLight, starfield;
 const dataCache = new Map();
 let map, sparksLayer, heatLayer;
-let isHeatmapVisible = false;
+let isHeatmapVisible = false; // Removido isMapInitialized
 const EARTH_RADIUS = 2;
 const DEG = THREE.MathUtils.degToRad;
 
@@ -171,9 +169,29 @@ function initThree() {
   directionalLight.position.set(5, 3, 5);
   scene.add(ambientLight, directionalLight);
 
+  // Create starfield
+  const starVertices = [];
+  for (let i = 0; i < 10000; i++) {
+    const x = (Math.random() - 0.5) * 2000;
+    const y = (Math.random() - 0.5) * 2000;
+    const z = -Math.random() * 2000; // Place stars behind the Earth
+    starVertices.push(x, y, z);
+  }
+  const starGeometry = new THREE.BufferGeometry();
+  starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
+  const starMaterial = new THREE.PointsMaterial({
+    color: 0xffffff,
+    size: 0.7,
+    transparent: true,
+    opacity: 0.8
+  });
+  starfield = new THREE.Points(starGeometry, starMaterial);
+  scene.add(starfield);
+
   function animate() {
     requestAnimationFrame(animate);
     clouds.rotation.y += 0.000050;
+    if (starfield) starfield.rotation.y += 0.00002; // Slow rotation for the stars
     renderer.render(scene, camera);
   }
   animate();
@@ -221,23 +239,45 @@ function setupScrollAnimation() {
     onEnter: async () => {
       if (map) return;
 
-      gsap
-        .timeline()
+      const todayString = new Date().toISOString().split("T")[0];
+      const isDataCached = dataCache.has(todayString);
+
+      const mapLoader = document.getElementById("map-loader");
+      const mapLoaderText = document.getElementById('map-loader-text');
+
+      // Animação de transição do Globo para o Mapa
+      const transitionTimeline = gsap.timeline();
+      transitionTimeline
         .to(camera.position, { z: 2.5, duration: 0.8, ease: "power2.in" })
         .to("#webgl-container", { opacity: 0, duration: 0.5 }, "-=0.5")
-        .to(
-          "#map-container",
-          { opacity: 1, visibility: "visible", duration: 0.8 },
-          "-=0.3"
-        );
+        .to("#map-container", { opacity: 1, visibility: "visible", duration: 0.8 }, "-=0.3");
 
-      // Show initial loading message
-      document.getElementById("fire-counter").textContent = "Loading...";
+      let initialFireData;
 
-      // Fetch today's data
-      const todayString = new Date().toISOString().split("T")[0];
-      const initialFireData = await getFireData(todayString);
+      if (isDataCached) {
+        // CAMINHO RÁPIDO: Dados já estão em cache, pula o loader.
+        console.log("Dados em cache, pulando animação de loading.");
+        initialFireData = dataCache.get(todayString);
+      } else {
+        // CAMINHO LENTO: Primeiro carregamento, mostra animações.
+        gsap.to(mapLoader, { opacity: 1, visibility: 'visible', duration: 0.5 });
+        mapLoaderText.textContent = "AQUIRINDO SINAL...";
+        document.getElementById("fire-counter").textContent = "---";
 
+        const scanline = document.getElementById('scanline');
+        gsap.timeline({ delay: 0.5 })
+          .set(scanline, { top: '0%', opacity: 1 })
+          .to(scanline, { top: '100%', duration: 1.5, ease: 'power2.inOut' })
+          .to(scanline, { opacity: 0, duration: 0.5 }, "-=0.5");
+
+        initialFireData = await getFireData(todayString);
+        mapLoaderText.textContent = "ANALISANDO DADOS...";
+        
+        // Esconde o loader
+        gsap.to(mapLoader, { opacity: 0, duration: 0.5, onComplete: () => mapLoader.style.visibility = 'hidden' });
+      }
+
+      // Acende a luz de perigo com base nos dados
       if (initialFireData.length > 0) {
         const calculatedIntensity = Math.min(
           initialFireData.length / 40000,
