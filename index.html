@@ -15,12 +15,19 @@
 </head>
 
 <body>
+  <div id="loading-overlay">
+    <div class="loading-content">
+      <img src="img/space_orange@.png" alt="Project Logo" class="loading-logo">
+      <p>Loading cosmic data...</p>
+    </div>
+  </div>
+
   <header class="site-header">
     <div class="header-content">
       <!-- Placeholder to keep layout; can be used for a title later -->
       <div></div>
       <div class="top-right-controls">
-        <a href="#" class="site-logo">
+        <a id="home-btn" href="javascript:void(0);" class="site-logo">
           <img src="img/space_orange@.png" alt="Project logo">
           <span>FireWatch</span>
         </a>
@@ -115,7 +122,6 @@
           <iframe
             src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f"
             width="100%" height="500px" frameborder="0" allowfullscreen
-            loading="lazy"
             title="ArcGIS StoryMap about Fire"
             sandbox="allow-scripts allow-same-origin"
           ></iframe>

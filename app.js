@@ -63,10 +63,11 @@ function latLonToVector3(lat, lon, radius) {
 
 // Function to draw individual points on the map
 function updateMapWithPoints(fireData) {
-  if (!sparksLayer) {
-    sparksLayer = L.layerGroup().addTo(map);
+  // Garante que a camada seja limpa e recriada se necessário
+  if (sparksLayer) {
+    sparksLayer.clearLayers();
   }
-  sparksLayer.clearLayers();
+  if (!sparksLayer || !map.hasLayer(sparksLayer)) { sparksLayer = L.layerGroup().addTo(map); }
 
   const toggleBtn = document.getElementById("toggle-view-btn");
   toggleBtn.disabled = true;
@@ -117,6 +118,17 @@ function updateMapWithHeatmap(fireData) {
 // --- 3D SCENE SETUP ---
 function initThree() {
   scene = new THREE.Scene();
+
+  const loadingManager = new THREE.LoadingManager();
+  const loadingOverlay = document.getElementById('loading-overlay');
+
+  loadingManager.onLoad = () => {
+    // Esconde a tela de carregamento quando tudo estiver pronto
+    gsap.to(loadingOverlay, { opacity: 0, duration: 1, onComplete: () => {
+      loadingOverlay.style.display = 'none';
+    }});
+  };
+
   camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
@@ -128,7 +140,7 @@ function initThree() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.getElementById("webgl-container").appendChild(renderer.domElement);
 
-  const textureLoader = new THREE.TextureLoader();
+  const textureLoader = new THREE.TextureLoader(loadingManager);
   const earthMaterial = new THREE.MeshPhongMaterial({
     map: textureLoader.load("textures/earth_diffuse.jpg"),
     specularMap: textureLoader.load("textures/earth_specular.png"),
@@ -190,7 +202,7 @@ function setupScrollAnimation() {
       trigger: "#america-sul",
       start: "top top",
       end: "bottom top",
-      scrub: true,
+      scrub: 1.5, // Usar um número suaviza a animação ao rolar
     },
   });
   gsap.to(camera.position, {
@@ -199,7 +211,7 @@ function setupScrollAnimation() {
       trigger: "#brasil",
       start: "top center",
       end: "bottom center",
-      scrub: true,
+      scrub: 1.5, // Suaviza também o zoom
     },
   });
 
@@ -272,7 +284,7 @@ function setupScrollAnimation() {
         if (isHeatmapVisible) {
           if (sparksLayer) sparksLayer.clearLayers();
           updateMapWithHeatmap(fireData);
-        } else {
+        } else { // Se a visão de pontos estiver ativa
           if (heatLayer) heatLayer.remove();
           heatLayer = null;
           updateMapWithPoints(fireData);
@@ -385,6 +397,18 @@ function setupScrollAnimation() {
     });
   });
 
+  // Animação para os elementos do conteúdo estático
+  gsap.utils.toArray('.sar-texto, .comparison-content, .contribuicao-texto').forEach(elem => {
+    gsap.from(elem.children, {
+      y: 30,
+      opacity: 0,
+      stagger: 0.2,
+      duration: 0.8,
+      ease: 'power2.out',
+      scrollTrigger: { trigger: elem, start: 'top 80%' }
+    });
+  });
+
   const modal = document.getElementById("data-modal");
   const openBtn = document.getElementById("about-data-btn");
   const closeBtn = document.getElementById("close-modal-btn");
@@ -406,5 +430,44 @@ function setupScrollAnimation() {
   });
 }
 
+function setupHomeButton() {
+  const homeBtn = document.getElementById('home-btn');
+  if (!homeBtn) return;
+
+  homeBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+
+    // 1. Rola a página para o topo
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // 2. Garante que o mapa 2D seja removido e o globo 3D apareça
+    if (map) {
+      map.remove();
+      map = null;
+    }
+    gsap.to("#map-container", { opacity: 0, visibility: 'hidden', duration: 0.5 });
+    gsap.to("#webgl-container", { opacity: 1, duration: 0.5 });
+
+    // 3. Reseta a câmera e a rotação do globo para o estado inicial
+    gsap.to(camera.position, { z: 5, duration: 1.5, ease: 'power3.inOut' });
+    gsap.to(earth.rotation, { x: 0, y: 0, duration: 1.5, ease: 'power3.inOut' });
+
+    // 4. Reseta o estado do botão de densidade e da luz de perigo
+    isHeatmapVisible = false;
+    const toggleBtn = document.getElementById("toggle-view-btn");
+    if (toggleBtn) toggleBtn.textContent = "Analyze Density";
+    gsap.to(ominousLight, { intensity: 0, duration: 1 });
+
+    // 5. Reativa o "scroll-prompt"
+    const scrollPrompt = document.getElementById("scroll-prompt");
+    gsap.to(scrollPrompt, { autoAlpha: 1, delay: 0.5 });
+
+    // 6. Força o ScrollTrigger a reavaliar as posições
+    ScrollTrigger.refresh();
+  });
+}
+
 initThree();
 setupScrollAnimation();
+// setupHomeButton(); // Desativado conforme solicitado
+// ...existing code...

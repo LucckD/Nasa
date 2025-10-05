@@ -1,4 +1,3 @@
-//Mouse hover no mapa de calor?
 //Deixar mais animado/vivo
 //tela de carregamento para evitar q a terra apareça sem nuvens
 //tentar evitar os bugs ao scrollar pra cima (terra girando demais)
