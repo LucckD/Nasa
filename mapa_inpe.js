@@ -136,11 +136,11 @@ async function initFireRiskMap(mapId) {
   }
 
   function getFmaInfo(fma) {
-    if (fma > 3000) return { cor: "#d73027", perigo: "Crítico" };
-    if (fma > 1000) return { cor: "#fc8d59", perigo: "Muito Alto" };
-    if (fma > 500) return { cor: "#fee08b", perigo: "Alto" };
-    if (fma > 200) return { cor: "#ffffbf", perigo: "Médio" };
-    return { cor: "#91cf60", perigo: "Baixo" };
+    if (fma > 3000) return { cor: "#d73027", perigo: "Critical" };
+    if (fma > 1000) return { cor: "#fc8d59", perigo: "Very High" };
+    if (fma > 500) return { cor: "#fee08b", perigo: "High" };
+    if (fma > 200) return { cor: "#ffffbf", perigo: "Medium" };
+    return { cor: "#91cf60", perigo: "Low" };
   }
 
   const hoje = new Date();

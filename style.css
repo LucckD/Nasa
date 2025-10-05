@@ -989,3 +989,65 @@ time-slider::-webkit-slider-thumb {
   background-color: var(--accent-color);
   transition: width 0.3s ease-out;
 }
+
+@media (max-width: 768px) {
+  .story-panel {
+    width: 100%;
+    max-width: 100%;
+    min-width: unset;
+    border-right: none;
+  }
+
+  .story-section {
+    padding: 2rem 1.5rem;
+  }
+
+  #webgl-container, #map-container {
+    left: 0;
+  }
+
+  .story-section h2 {
+    font-size: 1.8rem;
+  }
+
+  .comparison-content h2,
+  .sar-texto h2,
+  .contribuicao-texto h2,
+  .inpe-risk-content h2 {
+    font-size: 2.2rem;
+  }
+
+  .comparison-content p,
+  .sar-texto p,
+  .contribuicao-texto p {
+    font-size: 1rem;
+  }
+
+  /* Ajusta as seções de conteúdo estático */
+  #desmatamento-sar,
+  #sar-rio,
+  #nossa-contribuicao,
+  #fogo {
+    padding: 4rem 1rem;
+  }
+
+  .image-grid {
+    grid-template-columns: 1fr; /* Coluna única para as imagens */
+    gap: 2rem;
+  }
+
+  #mapa-sar-container,
+  #tese-map-container {
+    height: 60vh; /* Altura menor para os mapas em telas pequenas */
+  }
+
+  /* Ajusta os controles do header */
+  .top-right-controls {
+    padding: 4px 8px;
+  }
+
+  #music-controls button {
+    width: 32px;
+    height: 32px;
+  }
+}
