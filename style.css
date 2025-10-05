@@ -19,7 +19,7 @@ body {
 #webgl-container, #map-container {
     position: fixed;
     top: 0;
-    left: 10vh;
+    left: 0; /* Ocupa a tela inteira */
     width: 100%;
     height: 100vh;
 }
@@ -40,7 +40,7 @@ body {
     background: var(--panel-background);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);    
 }
 
 .story-section {
@@ -405,11 +405,9 @@ time-slider::-webkit-slider-thumb {
   box-shadow: 0 8px G40px rgba(0, 0, 0, 0.15); 
 }
 
-/* --- Estilos para a Seção de Comparação SAR --- */
 #desmatamento-sar {
   padding: 6rem 2rem;
-  background-color: #f4f6f8; /* Um fundo claro para destacar as imagens */
-  color: #333;
+  background-color: #f4f6f8;
   text-align: center;
 }
 
@@ -421,7 +419,7 @@ time-slider::-webkit-slider-thumb {
 .comparison-content h2 {
   font-size: 2.8rem;
   font-weight: 700;
-  color: #1a237e; /* Um azul escuro para o título */
+  color: #1a237e;
   margin-bottom: 1.5rem;
 }
 
@@ -482,6 +480,55 @@ time-slider::-webkit-slider-thumb {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
+.inpe-container {
+  margin-top: 5rem;
+  padding: 2rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.inpe-container h3 {
+  font-size: 2rem;
+  color: #1a237e;
+  margin-bottom: 1rem;
+}
+
+#load-deforestation-chart-btn {
+  background-color: #1a237e;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+#load-deforestation-chart-btn:hover { background-color: #3949ab; }
+
+#load-inpe-map-btn {
+  background-color: #1a237e;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+#load-inpe-map-btn:hover { background-color: #3949ab; }
+#load-inpe-map-btn:disabled { background-color: #555; cursor: not-allowed; }
 .info.legend {
   background: rgba(26, 28, 36, 0.8);
   backdrop-filter: blur(5px);
@@ -489,6 +536,32 @@ time-slider::-webkit-slider-thumb {
   border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.legend h4 {
+  margin: 0 0 8px;
+  color: var(--heading-color);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.legend i {
+  width: 18px;
+  height: 18px;
+  float: left;
+  margin-right: 8px;
+  opacity: 0.9;
+  border-radius: 4px;
+}
+
+.legend div {
+  margin-bottom: 4px;
+}
+
+.legend-range {
+  font-size: 0.85em;
+  color: #ccc;
+  margin-left: 4px;
 }
 
 #toggle-view-btn:disabled {
@@ -499,36 +572,6 @@ time-slider::-webkit-slider-thumb {
 
 #toggle-view-btn:disabled:hover {
     background-color: #555;
-}
-
-.inpe-container {
-    width: 100%;
-    max-width: 400px; /* Ajuste conforme necessário */
-    margin-top: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    overflow: hidden; /* Essencial para o corte */
-}
-
-#inpe-map-image {
-    display: block;
-    width: 100%;
-}
-
-#load-interactive-map-btn {
-    margin-top: 1.5rem;
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.9rem;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-#load-interactive-map-btn:hover {
-    background-color: #008fcc;
 }
 
 #sar-rio {
@@ -584,27 +627,22 @@ time-slider::-webkit-slider-thumb {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
-/* --- CONTROLES DE MÚSICA FLUTUANTES --- */
-#music-controls {
-  /* Posicionamento Fixo */
+.top-right-controls {
   position: fixed;
   top: 25px;
   right: 25px;
-  z-index: 9999; /* Garante que fique acima de quase tudo */
-
-  /* Visual (Glassmorphism) */
-  background-color: rgba(10, 15, 25, 0.6); /* Fundo escuro semitransparente */
+  z-index: 9999;
+  background-color: rgba(10, 15, 25, 0.6);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px); /* Para compatibilidade com Safari */
+  -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50px; /* Deixa com formato de pílula */
+  border-radius: 50px;
   padding: 8px 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 
-  /* Layout Interno */
   display: flex;
   align-items: center;
-  gap: 8px; /* Espaço entre os botões */
+  gap: 8px;
 }
 
 #music-controls button {
@@ -626,28 +664,23 @@ time-slider::-webkit-slider-thumb {
 }
 
 #music-controls button:active {
-  transform: scale(0.9); /* Efeito de clique */
+  transform: scale(0.9);
 }
 
-/* Os ícones SVG dentro dos botões */
 #music-controls button svg {
   width: 20px;
   height: 20px;
-  fill: #e0e0e0; /* Cor dos ícones */
+  fill: #e0e0e0;
 }
 
 #music-controls button:hover svg {
   fill: #ffffff;
 }
 
-/* --- LÓGICA DE TROCA DE ÍCONE PLAY/PAUSE --- */
-
-/* Por padrão, o ícone de pause fica escondido */
 #play-pause-btn .pause-icon {
   display: none;
 }
 
-/* Quando o botão tiver a classe 'playing', esconde o play e mostra o pause */
 #play-pause-btn.playing .play-icon {
   display: none;
 }
@@ -669,4 +702,139 @@ time-slider::-webkit-slider-thumb {
   max-width: 850px;
   margin: 0 auto 4rem auto;
   text-align: center;
+}
+
+#inpe-risk-tool {
+  padding: 6rem 2rem;
+  background-color: #f4f6f8;
+  text-align: center;
+  color: #333;
+}
+
+.inpe-risk-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.inpe-risk-content h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #c62828; /* Um tom de vermelho para associar ao fogo */
+  margin-bottom: 1.5rem;
+}
+
+.inpe-risk-content p {
+  font-size: 1.1rem;
+  max-width: 800px;
+  margin: 0 auto 3rem auto;
+  line-height: 1.8;
+  color: #555;
+}
+
+.iframe-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.iframe-wrapper:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+  padding: 1rem 2rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.site-logo {
+  text-decoration: none;
+  color: var(--heading-color);
+  font-weight: 600;
+  font-size: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.site-logo img {
+  width: 32px;
+  height: 32px;
+}
+
+.site-footer {
+  background-color: #05080d;
+  padding: 2rem;
+  text-align: center;
+  color: #888;
+  font-size: 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Correção do Layout */
+.static-content {
+  position: relative;
+  z-index: 1;
+  background-color: #000; /* Garante que o conteúdo estático tenha um fundo */
+}
+
+#nossa-contribuicao {
+  width: 100%;
+  padding: 6rem 2rem;
+  background-color: #0a0f19;
+  color: var(--text-color);
+  font-family: 'Poppins', sans-serif;
+}
+
+.contribuicao-texto {
+  width: 90%;
+  max-width: 850px;
+  margin: 0 auto 4rem auto;
+  text-align: center;
+}
+
+.contribuicao-texto h2 {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--accent-color);
+  line-height: 1.2;
+  position: relative;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.contribuicao-texto h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background-color: var(--accent-color);
+  border-radius: 2px;
+}
+
+#tese-map-container {
+  width: 90%;
+  max-width: 1400px;
+  height: 80vh;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }

@@ -1,17 +1,22 @@
 document.addEventListener("DOMContentLoaded", () => {
     
-    // --- 1. REFERÊNCIAS AOS ELEMENTOS ---
     const music = document.getElementById("background-music");
     const playPauseBtn = document.getElementById("play-pause-btn");
     const volumeDownBtn = document.getElementById("volume-down-btn");
     const volumeUpBtn = document.getElementById("volume-up-btn");
 
-    // --- 2. CONFIGURAÇÃO INICIAL ---
     music.volume = 0.05;
 
-    // --- 3. LÓGICA DOS BOTÕES ---
+    // Tenta iniciar a música após a primeira interação do usuário com a página
+    function startMusicOnFirstInteraction() {
+      if (music.paused) {
+        music.play().catch(() => {}); // O catch evita erros se o autoplay for bloqueado
+        playPauseBtn.classList.add("playing");
+      }
+      document.body.removeEventListener('mousemove', startMusicOnFirstInteraction);
+    }
 
-    function togglePlayPause() {
+      function togglePlayPause() {
         if (music.paused) {
             music.play();
             playPauseBtn.classList.add("playing");
@@ -33,8 +38,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // --- 4. ADICIONA OS EVENTOS DE CLIQUE ---
     playPauseBtn.addEventListener("click", togglePlayPause);
     volumeUpBtn.addEventListener("click", volumeUp);
     volumeDownBtn.addEventListener("click", volumeDown);
+    document.body.addEventListener('mousemove', startMusicOnFirstInteraction, { once: true });
 });
