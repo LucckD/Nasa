@@ -344,6 +344,31 @@ function setupScrollAnimation() {
     },
   });
 
+  // --- Lazy Loading para os mapas estáticos ---
+
+  // Carrega o mapa de Risco de Incêndio (FMA) quando a seção #sar-rio entra na tela
+  ScrollTrigger.create({
+    trigger: "#sar-rio",
+    start: "top 80%", // Carrega um pouco antes de ficar totalmente visível
+    onEnter: () => {
+      // A função initFireRiskMap está em mapa_inpe.js
+      if (typeof initFireRiskMap === "function") {
+        initFireRiskMap("mapa-sar-container");
+      }
+    },
+    once: true // Garante que a função seja chamada apenas uma vez
+  });
+
+  // Carrega o mapa da Tese (Risco de Propagação) quando a seção #nossa-contribuicao entra na tela
+  ScrollTrigger.create({
+    trigger: "#nossa-contribuicao",
+    start: "top 80%",
+    onEnter: () => {
+      if (typeof initThesisMap === "function") initThesisMap();
+    },
+    once: true
+  });
+
   // Animate story panels
   document.querySelectorAll(".story-section").forEach((section) => {
     ScrollTrigger.create({
@@ -383,4 +408,3 @@ function setupScrollAnimation() {
 
 initThree();
 setupScrollAnimation();
-// ...existing code...

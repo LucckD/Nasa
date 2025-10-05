@@ -1,4 +1,3 @@
-//Musica de espaço enquanto estiver na tela do globo
 //Mouse hover no mapa de calor?
 //Deixar mais animado/vivo
 //tela de carregamento para evitar q a terra apareça sem nuvens
