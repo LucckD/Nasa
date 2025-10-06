@@ -16,7 +16,6 @@ body {
     overflow-x: hidden;
 }
 
-/* --- Loading Overlay --- */
 #loading-overlay {
     position: fixed;
     top: 0;
@@ -51,7 +50,7 @@ body {
 #webgl-container, #map-container {
     position: fixed;
     top: 0;
-    left: 10vh; /* Ocupa a tela inteira */
+    left: 10vh;
     width: 100%;
     height: 100vh;
 }
@@ -67,13 +66,12 @@ body {
 
 #scanline {
     position: absolute;
-    top: -10px; /* Start off-screen */
+    top: -10px;
     left: 0;
     width: 100%;
     height: 3px;
     background-color: var(--accent-color);
     box-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color);
-    z-index: 1001; /* Above map tiles */
     opacity: 0;
     border-radius: 50%;
     filter: blur(1px);
@@ -200,7 +198,6 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  /* Adicionado um brilho (glow) com a cor do ponto */
   box-shadow: 0 0 8px 2px var(--glow-color, rgba(255, 0, 0, 0.7));
   transform: scale(1);
   animation: pulse-aggressive 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
@@ -224,7 +221,7 @@ body {
 #hotzone-panel {
     position: fixed;
     top: 20px;
-    right: -300px; 
+    right: -300px;
     width: 250px;
     padding: 20px;
     background: rgba(255, 69, 0, 0.8);
@@ -394,7 +391,6 @@ time-slider::-webkit-slider-thumb {
     color: #1a1c24;
 }
 
-/* Estilos do Modal */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -512,7 +508,7 @@ time-slider::-webkit-slider-thumb {
 
 #mapa-prevencao-container:hover {
   transform: scale(1.015); 
-  box-shadow: 0 8px G40px rgba(0, 0, 0, 0.15); 
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15);
 }
 
 #desmatamento-sar {
@@ -802,8 +798,8 @@ time-slider::-webkit-slider-thumb {
 
 #fogo {
   width: 100%;
-  height: 100vh; /* Ocupa a altura total da tela */
-  padding: 0; /* Remove o espaçamento interno */
+  height: 100vh;
+  padding: 0;
   background-color: #0a0f19;
   display: flex; /* Permite que o filho se expanda */
 }
@@ -813,7 +809,7 @@ time-slider::-webkit-slider-thumb {
   justify-content: center;
   padding: 100px 300px 100px 300px;;
   width: 100%;
-  flex-grow: 1; /* Faz o div crescer para preencher o #fogo */
+  flex-grow: 1;
 }
 
 .fogo-texto iframe {
@@ -887,7 +883,7 @@ time-slider::-webkit-slider-thumb {
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
-  pointer-events: none; /* Impede que o link seja clicável */
+  pointer-events: none;
   cursor: default;
 }
 
@@ -905,11 +901,10 @@ time-slider::-webkit-slider-thumb {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Correção do Layout */
 .static-content {
   position: relative;
   z-index: 1;
-  background-color: #000; /* Garante que o conteúdo estático tenha um fundo */
+  background-color: #000;
 }
 
 #nossa-contribuicao {
@@ -958,17 +953,15 @@ time-slider::-webkit-slider-thumb {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
-/* Garante que o loader fique sobre o mapa */
 #thesis-map-loader {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 1001; /* Acima dos tiles do mapa */
+  z-index: 1001;
 }
 
-/* Estilos para o loader da tese */
 .thesis-loader-content {
   text-align: center;
   color: #fff;
