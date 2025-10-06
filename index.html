@@ -24,7 +24,6 @@
 
   <header class="site-header">
     <div class="header-content">
-      <!-- Placeholder to keep layout; can be used for a title later -->
       <div></div>
       <div class="top-right-controls">
         <a id="home-btn" href="javascript:void(0);" class="site-logo">
@@ -125,14 +124,12 @@
       </section>
     </div>
 
-    <!-- Static content starts here -->
     <div class="static-content">
       <section id="fogo">
         <div class="fogo-texto">
           <iframe
-            src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f"
-            width="100%" height="500px" frameborder="0" allowfullscreen
-            title="ArcGIS StoryMap about Fire"
+            src="https://storymaps.arcgis.com/stories/61717cbd305d40e89df6f30e0052ad1f?header=false"
+            width="100%" height="100%" frameborder="0" allowfullscreen title="ArcGIS StoryMap about Fire"
             sandbox="allow-scripts allow-same-origin"
           ></iframe>
         </div>
@@ -141,23 +138,20 @@
       <section id="desmatamento-sar">
         <div class="comparison-content">
           <h2>Visible Impact: Deforestation in Rondônia</h2>
-          <p>
-            Radar images (SAR) reveal agricultural expansion and the "fishbone" pattern of deforestation over decades. Purple/pink indicates intact forest, while green/yellow shows cleared areas.
-          </p>
+          <p>Radar images (SAR) reveal agricultural expansion and the "fishbone" pattern of deforestation over decades. Purple/pink indicates intact forest, while green/yellow shows cleared areas.</p>
           <div class="image-grid">
             <div class="image-item">
               <h3>BEFORE (1992)</h3>
               <img src="img/2001Sar.jpg" alt="SAR image of Rondônia in 1992 showing less deforestation" loading="lazy">
             </div>
             <div class="image-item">
-              <h3>AFTER (2018)</h3>
+              <h3>AFTER (2019)</h3>
               <img src="img/2019Sar.jpg" alt="SAR image of Rondônia in 2018 showing advanced deforestation" loading="lazy">
             </div>
           </div>
           <div class="gif-container">
             <h3>Annual Evolution (2013-2018)</h3>
             <p>The animation below, using Landsat data, shows annual progression of deforestation in the same region.</p>
-            <!-- Revertido para GIF conforme solicitado -->
             <img src="img/desflorestamento-2013-to-2018.gif" alt="Deforestation animation in Rondônia 2013-2018" loading="lazy" class="deforestation-gif">
           </div>
           <div class="inpe-container">
@@ -176,13 +170,9 @@
       <section id="sar-rio">
         <div class="sar-texto">
           <h2>Risk Forecast: The Next Step</h2>
-          <p>
-            Beyond monitoring current hotspots, we can use satellite data to predict future risk areas. Combining soil moisture, vegetation, and cumulative precipitation maps (such as the one below), models can forecast risk.
-          </p>
+          <p>Beyond monitoring current hotspots, we can use satellite data to predict future risk areas. By combining data on soil moisture, vegetation, and cumulative precipitation, models can forecast risk.</p>
           <p>The <strong>Monte Alegre Formula (FMA)</strong> is a prime example, an index that accumulates daily based on relative humidity and the number of consecutive days without significant rain. It helps to anticipate and act proactively.</p>
-          <p>
-            Precipitation is a critical factor. Maps like the one below, showing accumulated rainfall, are vital for identifying regions that have been dry for extended periods, making them significantly more vulnerable to fire outbreaks.
-          </p>
+          <p>Precipitation is a critical factor. Maps showing accumulated rainfall are vital for identifying regions that have been dry for extended periods, making them significantly more vulnerable to fire outbreaks.</p>
           <img src="img/SMEC_prec_acum_ams_2025100400z_108z.png" alt="Accumulated precipitation map"
             style="max-width: 100%; border-radius: 8px; margin-top: 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2);" loading="lazy">
         </div>
@@ -197,12 +187,8 @@
       <section id="nossa-contribuicao">
         <div class="contribuicao-texto">
           <h2>Our Contribution: From Monitoring to Prevention</h2>
-          <p>
-            A hotspot's real danger is its potential to spread. Our thesis is that by cross-referencing each NASA hotspot with local weather data (wind, humidity, temperature), we can generate a real-time <strong>Propagation Risk Index</strong>.
-          </p>
-          <p>
-            The map below demonstrates this concept. It analyzes a set of recent hotspots and classifies them based on their propagation risk. A hotspot in an area with strong winds and low humidity is a "Critical Alert" that demands a much faster response.
-          </p>
+          <p>A hotspot's real danger is its potential to spread. Our thesis is that by cross-referencing each NASA hotspot with local weather data (wind, humidity, temperature), we can generate a real-time <strong>Propagation Risk Index</strong>.</p>
+          <p>The map below demonstrates this concept. It analyzes a set of recent hotspots and classifies them based on their propagation risk. A hotspot in an area with strong winds and low humidity is a "Critical Alert" that demands a much faster response.</p>
         </div>
         <div id="tese-map-container"></div>
       </section>
@@ -236,7 +222,6 @@
     </div>
   </div>
 
-  <!-- Background music -->
   <audio id="background-music" src="sound/somEspaco.mp3" loop></audio>
 
   <footer class="site-footer">

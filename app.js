@@ -1,11 +1,10 @@
 let scene, camera, renderer, earth, clouds, ominousLight, starfield;
 const dataCache = new Map();
 let map, sparksLayer, heatLayer;
-let isHeatmapVisible = false; // Removido isMapInitialized
+let isHeatmapVisible = false; 
 const EARTH_RADIUS = 2;
 const DEG = THREE.MathUtils.degToRad;
 
-// --- DATA & CONVERSION FUNCTIONS ---
 async function getFireData(targetDateString) {
   const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d";
   const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${targetDateString}`;
@@ -49,7 +48,6 @@ async function getFireData(targetDateString) {
   }
 }
 
-// Convert lat/lon to 3D space
 function latLonToVector3(lat, lon, radius) {
   const phi = (90 - lat) * DEG;
   const theta = (lon + 90) * DEG;
@@ -59,9 +57,7 @@ function latLonToVector3(lat, lon, radius) {
   return new THREE.Vector3(x, y, z);
 }
 
-// Function to draw individual points on the map
 function updateMapWithPoints(fireData) {
-  // Garante que a camada seja limpa e recriada se necessário
   if (sparksLayer) {
     sparksLayer.clearLayers();
   }
@@ -99,7 +95,6 @@ function updateMapWithPoints(fireData) {
   addSparkBatch();
 }
 
-// Function to draw the heatmap
 function updateMapWithHeatmap(fireData) {
   if (heatLayer) {
     heatLayer.remove();
@@ -113,7 +108,6 @@ function updateMapWithHeatmap(fireData) {
   }).addTo(map);
 }
 
-// --- 3D SCENE SETUP ---
 function initThree() {
   scene = new THREE.Scene();
 
@@ -121,7 +115,6 @@ function initThree() {
   const loadingOverlay = document.getElementById('loading-overlay');
 
   loadingManager.onLoad = () => {
-    // Esconde a tela de carregamento quando tudo estiver pronto
     gsap.to(loadingOverlay, { opacity: 0, duration: 1, onComplete: () => {
       loadingOverlay.style.display = 'none';
     }});
@@ -169,12 +162,11 @@ function initThree() {
   directionalLight.position.set(5, 3, 5);
   scene.add(ambientLight, directionalLight);
 
-  // Create starfield
   const starVertices = [];
   for (let i = 0; i < 10000; i++) {
     const x = (Math.random() - 0.5) * 2000;
     const y = (Math.random() - 0.5) * 2000;
-    const z = -Math.random() * 2000; // Place stars behind the Earth
+    const z = -Math.random() * 2000;
     starVertices.push(x, y, z);
   }
   const starGeometry = new THREE.BufferGeometry();
@@ -191,7 +183,7 @@ function initThree() {
   function animate() {
     requestAnimationFrame(animate);
     clouds.rotation.y += 0.000050;
-    if (starfield) starfield.rotation.y += 0.00002; // Slow rotation for the stars
+    if (starfield) starfield.rotation.y += 0.00002;
     renderer.render(scene, camera);
   }
   animate();
@@ -220,7 +212,7 @@ function setupScrollAnimation() {
       trigger: "#america-sul",
       start: "top top",
       end: "bottom top",
-      scrub: 1.5, // Usar um número suaviza a animação ao rolar
+      scrub: 1.5,
     },
   });
   gsap.to(camera.position, {
@@ -229,7 +221,7 @@ function setupScrollAnimation() {
       trigger: "#brasil",
       start: "top center",
       end: "bottom center",
-      scrub: 1.5, // Suaviza também o zoom
+      scrub: 1.5,
     },
   });
 
@@ -245,7 +237,6 @@ function setupScrollAnimation() {
       const mapLoader = document.getElementById("map-loader");
       const mapLoaderText = document.getElementById('map-loader-text');
 
-      // Animação de transição do Globo para o Mapa
       const transitionTimeline = gsap.timeline();
       transitionTimeline
         .to(camera.position, { z: 2.5, duration: 0.8, ease: "power2.in" })
@@ -255,11 +246,9 @@ function setupScrollAnimation() {
       let initialFireData;
 
       if (isDataCached) {
-        // CAMINHO RÁPIDO: Dados já estão em cache, pula o loader.
         console.log("Dados em cache, pulando animação de loading.");
         initialFireData = dataCache.get(todayString);
       } else {
-        // CAMINHO LENTO: Primeiro carregamento, mostra animações.
         gsap.to(mapLoader, { opacity: 1, visibility: 'visible', duration: 0.5 });
         mapLoaderText.textContent = "ACQUIRING SIGNAL...";
         document.getElementById("fire-counter").textContent = "---";
@@ -273,11 +262,9 @@ function setupScrollAnimation() {
         initialFireData = await getFireData(todayString);
         mapLoaderText.textContent = "ANALYZING DATA...";
         
-        // Esconde o loader
         gsap.to(mapLoader, { opacity: 0, duration: 0.5, onComplete: () => mapLoader.style.visibility = 'hidden' });
       }
 
-      // Acende a luz de perigo com base nos dados
       if (initialFireData.length > 0) {
         const calculatedIntensity = Math.min(
           initialFireData.length / 40000,
@@ -290,7 +277,6 @@ function setupScrollAnimation() {
         });
       }
 
-      // Initialize the map
       map = L.map("map-container", { zoomControl: false }).setView(
         [-14.235, -51.925],
         5
@@ -302,7 +288,6 @@ function setupScrollAnimation() {
         }
       ).addTo(map);
 
-      // Show initial view (points) and animate counter
       updateMapWithPoints(initialFireData);
       updateCounter(initialFireData.length);
 
@@ -314,7 +299,7 @@ function setupScrollAnimation() {
         if (isHeatmapVisible) {
           if (sparksLayer) sparksLayer.clearLayers();
           updateMapWithHeatmap(fireData);
-        } else { // Se a visão de pontos estiver ativa
+        } else {
           if (heatLayer) heatLayer.remove();
           heatLayer = null;
           updateMapWithPoints(fireData);
@@ -324,7 +309,6 @@ function setupScrollAnimation() {
           : "Analyze Density";
       });
 
-      // Time slider logic
       const slider = document.getElementById("time-slider");
       const currentDateLabel = document.getElementById("current-date-label");
       const startDateLabel = document.getElementById("start-date-label");
@@ -399,22 +383,17 @@ function setupScrollAnimation() {
     },
   });
 
-  // --- Lazy Loading para os mapas estáticos ---
-
-  // Carrega o mapa de Risco de Incêndio (FMA) quando a seção #sar-rio entra na tela
   ScrollTrigger.create({
     trigger: "#sar-rio",
-    start: "top 80%", // Carrega um pouco antes de ficar totalmente visível
+    start: "top 80%",
     onEnter: () => {
-      // A função initFireRiskMap está em mapa_inpe.js
       if (typeof initFireRiskMap === "function") {
         initFireRiskMap("mapa-sar-container");
       }
     },
-    once: true // Garante que a função seja chamada apenas uma vez
+    once: true
   });
 
-  // Carrega o mapa da Tese (Risco de Propagação) quando a seção #nossa-contribuicao entra na tela
   ScrollTrigger.create({
     trigger: "#nossa-contribuicao",
     start: "top 80%",
@@ -424,7 +403,6 @@ function setupScrollAnimation() {
     once: true
   });
 
-  // Animate story panels
   document.querySelectorAll(".story-section").forEach((section) => {
     ScrollTrigger.create({
       trigger: section,
@@ -440,7 +418,6 @@ function setupScrollAnimation() {
     });
   });
 
-  // Animação para os elementos do conteúdo estático
   gsap.utils.toArray('.sar-texto, .comparison-content, .contribuicao-texto').forEach(elem => {
     gsap.from(elem.children, {
       y: 30,
@@ -465,7 +442,6 @@ function setupScrollAnimation() {
 
   openBtn.addEventListener("click", openModal);
   closeBtn.addEventListener("click", closeModal);
-  // Close modal when clicking outside content
   modal.addEventListener("click", (event) => {
     if (event.target === modal) {
       closeModal();
@@ -480,10 +456,8 @@ function setupHomeButton() {
   homeBtn.addEventListener('click', (e) => {
     e.preventDefault();
 
-    // 1. Rola a página para o topo
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // 2. Garante que o mapa 2D seja removido e o globo 3D apareça
     if (map) {
       map.remove();
       map = null;
@@ -491,21 +465,17 @@ function setupHomeButton() {
     gsap.to("#map-container", { opacity: 0, visibility: 'hidden', duration: 0.5 });
     gsap.to("#webgl-container", { opacity: 1, duration: 0.5 });
 
-    // 3. Reseta a câmera e a rotação do globo para o estado inicial
     gsap.to(camera.position, { z: 5, duration: 1.5, ease: 'power3.inOut' });
     gsap.to(earth.rotation, { x: 0, y: 0, duration: 1.5, ease: 'power3.inOut' });
 
-    // 4. Reseta o estado do botão de densidade e da luz de perigo
     isHeatmapVisible = false;
     const toggleBtn = document.getElementById("toggle-view-btn");
     if (toggleBtn) toggleBtn.textContent = "Analyze Density";
     gsap.to(ominousLight, { intensity: 0, duration: 1 });
 
-    // 5. Reativa o "scroll-prompt"
     const scrollPrompt = document.getElementById("scroll-prompt");
     gsap.to(scrollPrompt, { autoAlpha: 1, delay: 0.5 });
 
-    // 6. Força o ScrollTrigger a reavaliar as posições
     ScrollTrigger.refresh();
   });
 }

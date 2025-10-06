@@ -1,9 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // A inicialização dos mapas de risco e da tese foi movida para app.js
-  // para usar o ScrollTrigger e carregar dinamicamente.
-
-  // Inicializa a lógica para o mapa de desmatamento do INPE
-  // Isso é leve (apenas um event listener), então pode continuar aqui.
   initInpeDeforestationMap();
 });
 
@@ -25,7 +20,7 @@ async function initFireRiskMap(mapId) {
     maxBounds: brazilBounds,  // Restringe a visão a estes limites
     maxBoundsViscosity: 1.0   // Torna os limites "sólidos"
   }).setView([-15.78, -47.93], 4);
-  // Trocando o mapa escuro por um de satélite para um visual mais rico
+  // Swapping the dark map for a satellite one for a richer look
   L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
   }).addTo(map);
@@ -39,16 +34,16 @@ async function initFireRiskMap(mapId) {
     const response = await fetch(estadosUrl);
     const estadosData = await response.json();
     L.geoJSON(estadosData, {
-      pane: 'estadosPane', // Garante que a camada fique no painel de fundo
+      pane: 'estadosPane', // Ensures the layer stays in the background panel
       style: {
-        color: 'rgba(255, 255, 255, 0.6)', // Linha branca semi-transparente
+        color: 'rgba(255, 255, 255, 0.6)', // Semi-transparent white line
         weight: 1.5,
-        fillOpacity: 0.0 // Sem preenchimento
+        fillOpacity: 0.0 // No fill
       }
     }).addTo(map);
-    console.log("Camada de estados carregada no fundo do mapa.");
+    console.log("States layer loaded in the background of the map.");
   } catch (err) {
-    console.error("Erro ao carregar o GeoJSON dos estados:", err);
+    console.error("Error loading states GeoJSON:", err);
   }
 
   const regioes = {
@@ -104,35 +99,35 @@ async function initFireRiskMap(mapId) {
    *    - O índice é zerado se ocorrer chuva > 12.7mm.
    */
   function calcularFMA(dailyPrecipitation, hourlyHumidity) {
-    let fmaAcumulado = 0;
-    let diasSemChuva = 0;
+    let accumulatedFma = 0;
+    let daysWithoutRain = 0;
 
     for (let i = 0; i < dailyPrecipitation.length; i++) {
       const chuvaDoDia = dailyPrecipitation[i];
 
       // Zera o índice se a chuva for muito forte
       if (chuvaDoDia > 12.7) {
-        fmaAcumulado = 0;
-        diasSemChuva = 0;
+        accumulatedFma = 0;
+        daysWithoutRain = 0;
         continue;
       }
 
       if (chuvaDoDia > 2.5) {
-        diasSemChuva = 0; // Zera a contagem de dias secos
+        daysWithoutRain = 0; // Resets the count of dry days
       } else {
-        diasSemChuva++;
+        daysWithoutRain++;
       }
 
       const umidade13h = hourlyHumidity[i * 24 + 13]; // Pega a umidade às 13h do dia
       if (umidade13h === undefined || umidade13h === null) continue;
 
-      const N = Math.min(1.0 + diasSemChuva * 0.1, 2.0); // Coeficiente N
+      const N = Math.min(1.0 + daysWithoutRain * 0.1, 2.0); // Coefficient N
       const fmaDiario = (100 - umidade13h) * N;
 
-      fmaAcumulado += fmaDiario;
+      accumulatedFma += fmaDiario;
     }
 
-    return fmaAcumulado;
+    return accumulatedFma;
   }
 
   function getFmaInfo(fma) {
@@ -143,10 +138,10 @@ async function initFireRiskMap(mapId) {
     return { cor: "#91cf60", perigo: "Low" };
   }
 
+  // Retornando à lógica original: busca dados até o dia atual.
   const hoje = new Date();
   const dataInicio = new Date();
-  dataInicio.setDate(hoje.getDate() - 30); // Busca dados dos últimos 30 dias
-
+  dataInicio.setDate(hoje.getDate() - 30);
   const hojeStr = hoje.toISOString().split("T")[0];
   const inicioStr = dataInicio.toISOString().split("T")[0];
 
@@ -212,7 +207,7 @@ async function initFireRiskMap(mapId) {
         this.setStyle({ weight: 2.5, radius: 12 }); // Volta ao normal
       });
     } catch (err) {
-      console.error(`Erro ao processar dados para a região ${nomeRegiao}:`, err);
+      console.error(`Error processing data for region ${nomeRegiao}:`, err);
     }
   }
 
@@ -222,15 +217,15 @@ async function initFireRiskMap(mapId) {
   legend.onAdd = function (map) {
     const div = L.DomUtil.create('div', 'info legend');
     const grades = [
-      { fma: 0,    label: 'Low',        range: '0 - 200' },
-      { fma: 201,  label: 'Medium',     range: '201 - 500' },
+      { fma: 0,    label: 'Low',      range: '0 - 200' },
+      { fma: 201,  label: 'Medium',      range: '201 - 500' },
       { fma: 501,  label: 'High',       range: '501 - 1000' },
-      { fma: 1001, label: 'Very High',  range: '1001 - 3000' },
-      { fma: 3001, label: 'Critical',   range: '> 3000' },
+      { fma: 1001, label: 'Very High', range: '1001 - 3000' },
+      { fma: 3001, label: 'Critical',    range: '> 3000' },
     ];
 
     div.innerHTML = '<h4>Fire Risk</h4>';
-    // Percorre os níveis de perigo e gera um rótulo com uma caixa colorida para cada um
+    // Loop through the danger levels and generate a label with a colored box for each
     for (let i = 0; i < grades.length; i++) {
       const { cor } = getFmaInfo(grades[i].fma);
       div.innerHTML += `
@@ -248,9 +243,9 @@ function calculatePropagationRisk(weather) {
   }
   const { temp, humidity, wind } = weather;
   let score = 0;
-  if (wind > 8) score++;    // Vento > ~28 km/h
-  if (humidity < 40) score++; // Umidade baixa
-  if (temp > 30) score++;     // Temperatura alta
+  if (wind > 8) score++;
+  if (humidity < 40) score++;
+  if (temp > 30) score++; 
 
   if (score >= 3) return { level: 'Critical', color: '#d73027', radius: 12, pulsating: true }; // Raio bem maior
   if (score === 2) return { level: 'High', color: '#fc8d59', radius: 9, pulsating: false };
@@ -276,7 +271,7 @@ function getThesisPopupContent(point, risk) {
   if (point.weather) {
     content += `<p style="font-size: 0.9em; color: #aaa;">
         💨 Wind: ${(point.weather.wind * 3.6).toFixed(1)} km/h<br>
-        💧 Umidade: ${point.weather.humidity}%<br>
+        💧 Humidity: ${point.weather.humidity}%<br>
         🌡️ Temp: ${point.weather.temp}°C
       </p>`;
   }
@@ -285,7 +280,7 @@ function getThesisPopupContent(point, risk) {
 
 async function getThesisFireData() {
   const today = new Date().toISOString().split("T")[0];
-  const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d"; // Sua chave da API FIRMS
+  const NASA_API_KEY = "dad364bb4112d56be070ae5cb506ee8d";
   const apiUrl = `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_API_KEY}/VIIRS_SNPP_NRT/-79.4,-53.2,-33.9,13.4/1/${today}`;
 
   try {
@@ -306,7 +301,7 @@ async function getThesisFireData() {
       })
       .filter(p => p);
   } catch (error) {
-    console.error("Falha ao buscar dados de focos de calor para a tese:", error);
+    console.error("Failed to fetch hotspot data for thesis:", error);
     return [];
   }
 }
@@ -314,7 +309,7 @@ async function getThesisFireData() {
 async function initThesisMap() {
   const mapContainer = document.getElementById("tese-map-container");
   if (!mapContainer) {
-    console.warn("Contêiner do mapa da tese não encontrado.");
+    console.warn("Thesis map container not found.");
     return;
   }
 
@@ -328,16 +323,13 @@ async function initThesisMap() {
     maxZoom: 5,
   }).setView([-15, -55], 5);
 
-  // Mapa base mais limpo e com nomes de estados
   L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd',
     maxZoom: 19
   }).addTo(thesisMap);
 
-  // Garante que o mapa esteja pronto antes de carregar os dados
   thesisMap.whenReady(async () => {
-    // CRIA E ADICIONA O LOADER DEPOIS QUE O MAPA ESTÁ PRONTO
     const loaderHTML = `
       <div id="thesis-map-loader" style="display: flex; justify-content: center; align-items: center; background-color: rgba(10, 15, 25, 0.7); backdrop-filter: blur(4px);">
         <div class="thesis-loader-content">
@@ -348,8 +340,6 @@ async function initThesisMap() {
     `;
     mapContainer.insertAdjacentHTML('beforeend', loaderHTML);
 
-
-    // OTIMIZAÇÃO: Reutiliza a função getFireData que usa o cache.
     const today = new Date().toISOString().split("T")[0];
     const allFireData = await getFireData(today);
     const loader = document.getElementById('thesis-map-loader');
@@ -361,14 +351,14 @@ async function initThesisMap() {
       return;
     }
 
-    // Analisamos uma amostra para não sobrecarregar a API
+    // We analyze a sample to avoid overloading the API
     const sampleSize = 250;
     const fireSample = allFireData.sort(() => 0.5 - Math.random()).slice(0, sampleSize);
 
     let pointsProcessed = 0;
     loaderText.textContent = `Analyzing 0 of ${fireSample.length} hotspots...`;
 
-    // Executa as requisições em paralelo, mas atualiza a UI progressivamente
+    // Execute requests in parallel, but update the UI progressively
     const promises = fireSample.map(point =>
       (async () => {
         try {
@@ -393,7 +383,7 @@ async function initThesisMap() {
             }
           }
         } catch (err) {
-          console.error("Falha ao buscar dados de tempo para o ponto:", point, err);
+          console.error("Failed to fetch weather data for point:", point, err);
         }
 
         // Atualiza a UI de progresso
@@ -403,7 +393,7 @@ async function initThesisMap() {
       })()
     );
 
-    // Espera todas as promessas terminarem antes de esconder o loader
+    // Wait for all promises to finish before hiding the loader
     await Promise.all(promises);
 
     // Animação de fade-out para o loader
@@ -418,7 +408,7 @@ async function initThesisMap() {
       const div = L.DomUtil.create('div', 'info legend');
       div.innerHTML = `
         <h4>Propagation Risk</h4>
-        <div><i style="background: #d73027;"></i> Critical <span class="legend-range">(High Wind/Temp, Low Hum.)</span></div>
+        <div><i style="background: #d73027;"></i> Critical <span class="legend-range">(High Wind/Temp, Low Humidity)</span></div>
         <div><i style="background: #fc8d59;"></i> High <span class="legend-range">(2 of 3 risk factors)</span></div>
         <div><i style="background: #fee08b;"></i> Medium <span class="legend-range">(1 of 3 risk factors)</span></div>
         <div><i style="background: #91cf60;"></i> Low <span class="legend-range">(Favorable conditions)</span></div>
@@ -430,13 +420,12 @@ async function initThesisMap() {
 }
 
 function initInpeDeforestationMap() {
-  // Função limpa após a remoção do gráfico.
   const loadBtn = document.getElementById('load-deforestation-chart-btn');
   const chartContainer = document.getElementById('chart-container');
   const ctx = document.getElementById('deforestation-chart');
 
   if (!loadBtn || !chartContainer || !ctx) {
-    console.warn("Elementos para o gráfico de desmatamento não encontrados.");
+    console.warn("Elements for the deforestation chart not found.");
     return;
   }
 
@@ -444,7 +433,7 @@ function initInpeDeforestationMap() {
     loadBtn.style.display = 'none';
     chartContainer.style.display = 'block';
 
-    // Dados do PRODES (INPE) - Taxa de desmatamento (km²) na Amazônia Legal
+    // PRODES (INPE) Data - Deforestation rate (km²) in the Legal Amazon
     const prodesData = {
       labels: ['2014', '2015', '2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023'],
       values: [5012, 6207, 7893, 6947, 7536, 10129, 10851, 13038, 11594, 9001]
@@ -473,7 +462,9 @@ function initInpeDeforestationMap() {
             titleFont: { size: 16, weight: 'bold' },
             bodyFont: { size: 14 },
             callbacks: {
-              label: (context) => `Area: ${context.parsed.y.toLocaleString('en-US')} km²`,
+              label: function(context) {
+                return `Area: ${context.parsed.y.toLocaleString('en-US')} km²`;
+              }
             }
           }
         },
@@ -489,6 +480,6 @@ function initInpeDeforestationMap() {
       }
     });
 
-    console.log("Gráfico de desmatamento inicializado.");
+    console.log("Deforestation chart initialized.");
   });
 }
