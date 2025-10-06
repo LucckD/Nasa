@@ -105,6 +105,8 @@ async function initFireRiskMap(mapId) {
         daysWithoutRain++;
       }
 
+      const umidade13h = hourlyHumidity[i * 24 + 13];
+
       if (umidade13h === undefined || umidade13h === null) continue;
 
       const N = Math.min(1.0 + daysWithoutRain * 0.1, 2.0);
